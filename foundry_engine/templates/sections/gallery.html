@@ -1,0 +1,38 @@
+<section class="section-gallery">
+    <div class="gallery-container">
+        {% if content %}
+            <div class="gallery-intro">
+                {{ content|safe }}
+            </div>
+        {% endif %}
+
+        <div class="gallery-grid gallery-{{ layout }}"
+             style="--columns: {{ columns }}; --gap: {{ gap }};">
+            {% for image in images %}
+                <div class="gallery-item"
+                     {% if lightbox %}x-data="{ open: false }"{% endif %}>
+                    <img src="{{ image }}"
+                         alt="{{ captions.get(image, '') }}"
+                         class="gallery-image"
+                         loading="lazy"
+                         {% if lightbox %}@click="open = true" style="cursor: pointer;"{% endif %}>
+
+                    {% if captions.get(image) %}
+                        <div class="gallery-caption">{{ captions[image] }}</div>
+                    {% endif %}
+
+                    {% if lightbox %}
+                        <div x-show="open"
+                             @click.away="open = false"
+                             @keydown.escape.window="open = false"
+                             class="gallery-lightbox"
+                             style="display: none;">
+                            <button @click="open = false" class="lightbox-close">✕</button>
+                            <img src="{{ image }}" alt="{{ captions.get(image, '') }}">
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>

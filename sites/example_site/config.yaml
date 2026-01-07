@@ -1,0 +1,41 @@
+site:
+  name: "Example Site"
+  domain: "example.com"
+  description: "A beautiful static site powered by Foundry Engine"
+  favicon: "assets/images/favicon.ico"
+
+security:
+  allowed_hosts:
+    - "localhost"
+    - "127.0.0.1"
+    - "*.onrender.com"
+  cors_origins: []
+  jwt_enabled: false
+  csrf_enabled: true
+
+navigation:
+  type: "top_ribbon"
+  logo: null
+  logo_alt: "Example Site"
+  sticky: true
+  mobile_breakpoint: 768
+  items:
+    - text: "Home"
+      url: "/"
+    - text: "About"
+      url: "/about"
+    - text: "Contact"
+      url: "/contact"
+
+mail:
+  provider: "brevo"
+  from_email: "noreply@example.com"
+  from_name: "Example Site"
+  contact_recipient: "hello@example.com"
+
+pages:
+  - home
+  - about
+  - contact
+
+theme_css: "theme/custom.css"

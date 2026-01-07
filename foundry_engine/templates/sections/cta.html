@@ -1,0 +1,33 @@
+<section class="section-cta"
+         style="{% if background_color %}background-color: {{ background_color }};{% endif %} text-align: {{ text_align }};">
+    {% if background_image %}
+        <div class="cta-background"
+             style="background-image: url('{{ background_image }}'); opacity: {{ 1 - overlay_opacity }};"></div>
+        <div class="cta-overlay" style="opacity: {{ overlay_opacity }};"></div>
+    {% endif %}
+
+    <div class="cta-container">
+        {% if heading %}
+            <h2 class="cta-heading">{{ heading }}</h2>
+        {% endif %}
+
+        {% if subheading %}
+            <p class="cta-subheading">{{ subheading }}</p>
+        {% endif %}
+
+        {% if content %}
+            <div class="cta-content">{{ content|safe }}</div>
+        {% endif %}
+
+        {% if buttons %}
+            <div class="cta-buttons">
+                {% for button in buttons %}
+                    <a href="{{ button.url }}"
+                       class="btn btn-{{ button.style or 'primary' }}">
+                        {{ button.text }}
+                    </a>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+</section>

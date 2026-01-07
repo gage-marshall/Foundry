@@ -1,0 +1,46 @@
+<section class="section-testimonials">
+    <div class="testimonials-container">
+        {% if content %}
+            <div class="testimonials-intro">
+                {{ content|safe }}
+            </div>
+        {% endif %}
+
+        <div class="testimonials-{{ layout }}"
+             {% if layout == 'grid' %}style="--columns: {{ columns }};"{% endif %}>
+            {% for testimonial in testimonials %}
+                <div class="testimonial-card">
+                    {% if show_ratings and testimonial.rating %}
+                        <div class="testimonial-rating">
+                            {% for i in range(testimonial.rating) %}
+                                <span class="star">★</span>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <blockquote class="testimonial-quote">
+                        {{ testimonial.quote }}
+                    </blockquote>
+
+                    <div class="testimonial-author">
+                        {% if testimonial.photo %}
+                            <img src="{{ testimonial.photo }}"
+                                 alt="{{ testimonial.name }}"
+                                 class="author-photo">
+                        {% endif %}
+
+                        <div class="author-info">
+                            <div class="author-name">{{ testimonial.name }}</div>
+                            {% if testimonial.title %}
+                                <div class="author-title">{{ testimonial.title }}</div>
+                            {% endif %}
+                            {% if testimonial.company %}
+                                <div class="author-company">{{ testimonial.company }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>

@@ -1,0 +1,53 @@
+page:
+  slug: "home"
+  title: "Welcome to Foundry"
+  meta_description: "A modern, secure, and fast static site engine built with FastAPI"
+
+sections:
+  - type: "hero"
+    content: "sections/hero-home.md"
+    config:
+      background_image: null
+      height: "100vh"
+      overlay_opacity: 0.4
+      text_align: "center"
+      cta_button:
+        text: "Get Started"
+        url: "/about"
+        style: "primary"
+
+  - type: "features"
+    content: "sections/features.md"
+    config:
+      columns: 3
+      icon_style: "outlined"
+      card_style: "elevated"
+      features:
+        - title: "Secure"
+          description: "Built-in JWT authentication, CSRF protection, rate limiting, and security headers"
+          icon: "🔒"
+        - title: "Fast"
+          description: "Async/await throughout, response caching, and optimized static asset delivery"
+          icon: "⚡"
+        - title: "Modular"
+          description: "Flexible section types and navigation styles for rapid site development"
+          icon: "🧩"
+
+  - type: "text"
+    content: "sections/about-preview.md"
+    config:
+      max_width: "800px"
+      text_align: "center"
+
+  - type: "footer"
+    config:
+      copyright: "&copy; 2025 Example Site. Powered by Foundry Engine."
+      columns:
+        - title: "Quick Links"
+          links:
+            - text: "Home"
+              url: "/"
+            - text: "About"
+              url: "/about"
+            - text: "Contact"
+              url: "/contact"

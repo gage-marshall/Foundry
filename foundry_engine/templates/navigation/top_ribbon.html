@@ -1,0 +1,47 @@
+<div class="nav-top-ribbon{% if sticky %} nav-sticky{% endif %}" x-data="{ mobileMenuOpen: false }">
+    <div class="nav-container">
+        <div class="nav-brand">
+            {% if logo %}
+                <a href="/">
+                    <img src="{{ logo }}" alt="{{ logo_alt }}" class="nav-logo">
+                </a>
+            {% else %}
+                <a href="/" class="nav-logo-text">{{ logo_alt }}</a>
+            {% endif %}
+        </div>
+
+        <!-- Desktop Navigation -->
+        <ul class="nav-items nav-desktop">
+            {% for item in items %}
+                <li class="nav-item{% if item.is_active %} nav-active{% endif %}">
+                    <a href="{{ item.url }}" class="nav-link">
+                        {% if item.icon %}<span class="nav-icon">{{ item.icon }}</span>{% endif %}
+                        {{ item.text }}
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+
+        <!-- Mobile Menu Toggle -->
+        <button @click="mobileMenuOpen = !mobileMenuOpen" class="nav-mobile-toggle" aria-label="Toggle menu">
+            <span x-show="!mobileMenuOpen">☰</span>
+            <span x-show="mobileMenuOpen">✕</span>
+        </button>
+    </div>
+
+    <!-- Mobile Navigation -->
+    <div x-show="mobileMenuOpen"
+         x-transition
+         class="nav-mobile-menu">
+        <ul class="nav-items">
+            {% for item in items %}
+                <li class="nav-item{% if item.is_active %} nav-active{% endif %}">
+                    <a href="{{ item.url }}" class="nav-link">
+                        {% if item.icon %}<span class="nav-icon">{{ item.icon }}</span>{% endif %}
+                        {{ item.text }}
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>

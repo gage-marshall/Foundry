@@ -1,0 +1,7 @@
+<section class="section-text"
+         style="padding: {{ padding }};{% if background_color %} background-color: {{ background_color }};{% endif %}">
+    <div class="text-container"
+         style="max-width: {{ max_width }}; text-align: {{ text_align }};">
+        {{ content|safe }}
+    </div>
+</section>

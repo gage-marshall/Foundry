@@ -1,0 +1,13 @@
+<section class="section-parallax"
+         style="height: {{ height }};"
+         data-parallax-speed="{{ speed }}">
+    {% if background_image %}
+        <div class="parallax-background"
+             style="background-image: url('{{ background_image }}'); opacity: {{ 1 - overlay_opacity }};"></div>
+        <div class="parallax-overlay" style="opacity: {{ overlay_opacity }};"></div>
+    {% endif %}
+
+    <div class="parallax-content">
+        {{ content|safe }}
+    </div>
+</section>

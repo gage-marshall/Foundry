@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <title>{% block title %}{{ page.title }} - {{ site.name }}{% endblock %}</title>
+
+    <meta name="description" content="{% block description %}{{ page.meta_description or site.description }}{% endblock %}">
+    {% if page.meta_keywords %}<meta name="keywords" content="{{ page.meta_keywords }}">{% endif %}
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="{{ page.og_title or page.title }}">
+    <meta property="og:description" content="{{ page.og_description or page.meta_description or site.description }}">
+    {% if page.og_image or site.og_image %}<meta property="og:image" content="{{ page.og_image or site.og_image }}">{% endif %}
+
+    <!-- Favicon -->
+    {% if site.favicon %}<link rel="icon" href="{{ site.favicon }}">{% endif %}
+
+    <!-- Core Engine CSS -->
+    <link rel="stylesheet" href="/static/engine/css/foundry-base.css">
+
+    <!-- Site Theme CSS -->
+    <link rel="stylesheet" href="/theme/custom.css">
+
+    <!-- HTMX for interactivity -->
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+
+    <!-- Alpine.js for lightweight JS -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.5/dist/cdn.min.js"></script>
+
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    <!-- Navigation -->
+    <nav id="main-navigation" role="navigation">
+        {{ navigation_html|safe }}
+    </nav>
+
+    <!-- Main Content -->
+    <main id="main-content" role="main">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Core Engine JS -->
+    <script src="/static/engine/js/foundry.js"></script>
+
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

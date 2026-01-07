@@ -1,0 +1,35 @@
+# Render deployment configuration for Foundry Engine
+
+services:
+  - type: web
+    name: foundry-example-site
+    env: python
+    region: oregon
+    plan: starter
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: FOUNDRY_ENV
+        value: production
+      - key: FOUNDRY_SITE_PATH
+        value: ./sites/example_site
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ALLOWED_HOSTS
+        value: "*.onrender.com"
+      - key: RATE_LIMIT_ENABLED
+        value: true
+      - key: RATE_LIMIT_PER_MINUTE
+        value: 10
+      - key: LOG_LEVEL
+        value: INFO
+      # Email configuration - set these in Render dashboard
+      - key: MAIL_PROVIDER
+        value: brevo
+      - key: BREVO_API_KEY
+        sync: false  # Set manually in dashboard
+      # Optional JWT configuration
+      - key: JWT_SECRET_KEY
+        generateValue: true
+    healthCheckPath: /health
+    autoDeploy: true

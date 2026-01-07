@@ -1,0 +1,29 @@
+<section class="section-hero{% if parallax %} section-parallax{% endif %}"
+         style="height: {{ height }};">
+    {% if background_image %}
+        <div class="hero-background"
+             style="background-image: url('{{ background_image }}'); opacity: {{ 1 - overlay_opacity }};"></div>
+    {% endif %}
+
+    {% if background_video %}
+        <video class="hero-video" autoplay muted loop playsinline>
+            <source src="{{ background_video }}" type="video/mp4">
+        </video>
+        <div class="hero-overlay" style="opacity: {{ overlay_opacity }};"></div>
+    {% endif %}
+
+    <div class="hero-content" style="text-align: {{ text_align }};">
+        <div class="hero-text">
+            {{ content|safe }}
+        </div>
+
+        {% if cta_button %}
+            <div class="hero-cta">
+                <a href="{{ cta_button.url }}"
+                   class="btn btn-{{ cta_button.style or 'primary' }}">
+                    {{ cta_button.text }}
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</section>

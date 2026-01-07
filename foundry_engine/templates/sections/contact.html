@@ -1,0 +1,76 @@
+<section class="section-contact">
+    <div class="contact-container">
+        {% if content %}
+            <div class="contact-intro">
+                {{ content|safe }}
+            </div>
+        {% endif %}
+
+        <form class="contact-form"
+              hx-post="/api/contact"
+              hx-trigger="submit"
+              hx-target="#contact-message"
+              hx-swap="innerHTML"
+              x-data="{ submitting: false }"
+              @htmx:before-request="submitting = true"
+              @htmx:after-request="submitting = false">
+
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+
+            <div id="contact-message" role="alert"></div>
+
+            {% for field in fields %}
+                <div class="form-group">
+                    <label for="{{ field.name }}" class="form-label">
+                        {{ field.label or field.name|title }}
+                        {% if field.required %}<span class="required">*</span>{% endif %}
+                    </label>
+
+                    {% if field.type == 'textarea' %}
+                        <textarea
+                            id="{{ field.name }}"
+                            name="{{ field.name }}"
+                            class="form-control"
+                            {% if field.placeholder %}placeholder="{{ field.placeholder }}"{% endif %}
+                            {% if field.required %}required{% endif %}
+                            rows="5"></textarea>
+                    {% elif field.type == 'select' %}
+                        <select
+                            id="{{ field.name }}"
+                            name="{{ field.name }}"
+                            class="form-control"
+                            {% if field.required %}required{% endif %}>
+                            <option value="">Select...</option>
+                            {% for option in field.options %}
+                                <option value="{{ option }}">{{ option }}</option>
+                            {% endfor %}
+                        </select>
+                    {% else %}
+                        <input
+                            type="{{ field.type }}"
+                            id="{{ field.name }}"
+                            name="{{ field.name }}"
+                            class="form-control"
+                            {% if field.placeholder %}placeholder="{{ field.placeholder }}"{% endif %}
+                            {% if field.required %}required{% endif %}>
+                    {% endif %}
+                </div>
+            {% endfor %}
+
+            {% if recaptcha %}
+                <div class="g-recaptcha" data-sitekey="{{ recaptcha_site_key }}"></div>
+            {% endif %}
+
+            <button type="submit"
+                    class="btn btn-primary"
+                    :disabled="submitting">
+                <span x-show="!submitting">{{ submit_text }}</span>
+                <span x-show="submitting">Sending...</span>
+            </button>
+        </form>
+    </div>
+</section>
+
+{% if recaptcha %}
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+{% endif %}

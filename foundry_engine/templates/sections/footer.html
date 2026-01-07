@@ -1,0 +1,60 @@
+<footer class="section-footer"
+        {% if background_color %}style="background-color: {{ background_color }};"{% endif %}>
+    <div class="footer-container">
+        {% if logo %}
+            <div class="footer-brand">
+                <img src="{{ logo }}" alt="Logo" class="footer-logo">
+            </div>
+        {% endif %}
+
+        {% if columns %}
+            <div class="footer-columns">
+                {% for column in columns %}
+                    <div class="footer-column">
+                        {% if column.title %}
+                            <h4 class="footer-column-title">{{ column.title }}</h4>
+                        {% endif %}
+
+                        {% if column.links %}
+                            <ul class="footer-links">
+                                {% for link in column.links %}
+                                    <li><a href="{{ link.url }}">{{ link.text }}</a></li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+
+                        {% if column.content %}
+                            <div class="footer-content">{{ column.content|safe }}</div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% if social_links %}
+            <div class="footer-social">
+                {% for social in social_links %}
+                    <a href="{{ social.url }}"
+                       target="_blank"
+                       rel="noopener noreferrer"
+                       aria-label="{{ social.platform }}"
+                       class="social-link">
+                        {{ social.icon|safe }}
+                    </a>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% if content %}
+            <div class="footer-main-content">
+                {{ content|safe }}
+            </div>
+        {% endif %}
+
+        {% if copyright %}
+            <div class="footer-copyright">
+                {{ copyright|safe }}
+            </div>
+        {% endif %}
+    </div>
+</footer>

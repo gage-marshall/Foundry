@@ -1,0 +1,32 @@
+page:
+  slug: "about"
+  title: "About Foundry"
+  meta_description: "Learn about Foundry Engine - a modern static site generator built with FastAPI"
+
+sections:
+  - type: "hero"
+    content: "sections/hero-about.md"
+    config:
+      height: "50vh"
+      text_align: "center"
+
+  - type: "text"
+    content: "sections/about-content.md"
+    config:
+      max_width: "900px"
+      text_align: "left"
+      padding: "4rem 2rem"
+
+  - type: "cta"
+    config:
+      heading: "Ready to build your site?"
+      subheading: "Get started with Foundry Engine today"
+      text_align: "center"
+      buttons:
+        - text: "Contact Us"
+          url: "/contact"
+          style: "primary"
+
+  - type: "footer"
+    config:
+      copyright: "&copy; 2025 Example Site. Powered by Foundry Engine."

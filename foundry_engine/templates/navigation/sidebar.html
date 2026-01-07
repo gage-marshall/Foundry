@@ -1,0 +1,41 @@
+<aside class="nav-sidebar" x-data="{ collapsed: false }">
+    <div class="sidebar-header">
+        {% if logo %}
+            <a href="/">
+                <img src="{{ logo }}" alt="{{ logo_alt }}" class="nav-logo">
+            </a>
+        {% else %}
+            <a href="/" class="nav-logo-text">{{ logo_alt }}</a>
+        {% endif %}
+    </div>
+
+    <nav class="sidebar-nav">
+        <ul class="nav-items">
+            {% for item in items %}
+                <li class="nav-item{% if item.is_active %} nav-active{% endif %}"
+                    {% if item.children %}x-data="{ open: {{ 'true' if item.is_active else 'false' }} }"{% endif %}>
+                    <a href="{{ item.url }}" class="nav-link">
+                        {% if item.icon %}<span class="nav-icon">{{ item.icon }}</span>{% endif %}
+                        <span class="nav-text">{{ item.text }}</span>
+                        {% if item.children %}
+                            <button @click="open = !open" class="nav-toggle">
+                                <span x-show="!open">▶</span>
+                                <span x-show="open">▼</span>
+                            </button>
+                        {% endif %}
+                    </a>
+
+                    {% if item.children %}
+                        <ul x-show="open" class="nav-subitems">
+                            {% for child in item.children %}
+                                <li class="nav-subitem{% if child.is_active %} nav-active{% endif %}">
+                                    <a href="{{ child.url }}" class="nav-link">{{ child.text }}</a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    </nav>
+</aside>

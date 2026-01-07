@@ -1,0 +1,120 @@
+"""FastAPI application factory for Foundry Engine."""
+
+import logging
+from pathlib import Path
+
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
+
+from foundry_engine.config import FoundrySettings, load_site_config
+from foundry_engine.routers import contact, pages
+from foundry_engine.security import SecurityHeadersMiddleware, setup_rate_limiting
+from foundry_engine.utils.markdown import setup_markdown_processor
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
+logger = logging.getLogger(__name__)
+
+
+def create_app() -> FastAPI:
+    """Create and configure the FastAPI application."""
+    # Load settings
+    settings = FoundrySettings()
+
+    # Set log level from settings
+    logging.getLogger().setLevel(settings.log_level)
+    logger.info(f"Starting Foundry Engine in {settings.foundry_env.value} mode")
+
+    # Verify site path exists
+    if not settings.foundry_site_path.exists():
+        raise FileNotFoundError(
+            f"Site path does not exist: {settings.foundry_site_path.absolute()}"
+        )
+
+    # Load site configuration
+    try:
+        site_config = load_site_config(settings.foundry_site_path)
+        logger.info(f"Loaded site configuration for: {site_config.site.name}")
+    except Exception as e:
+        logger.error(f"Failed to load site configuration: {e}")
+        raise
+
+    # Create FastAPI app
+    app = FastAPI(
+        title=site_config.site.name,
+        description=site_config.site.description or "Powered by Foundry Engine",
+        version="0.1.0",
+        docs_url="/docs" if settings.foundry_env == "development" else None,
+        redoc_url="/redoc" if settings.foundry_env == "development" else None,
+    )
+
+    # Add security headers middleware
+    app.add_middleware(
+        SecurityHeadersMiddleware,
+        allowed_hosts=site_config.security.allowed_hosts,
+        environment=settings.foundry_env,
+    )
+
+    # Setup rate limiting
+    if settings.rate_limit_enabled:
+        setup_rate_limiting(app, settings)
+
+    # Setup Jinja2 templates
+    engine_templates_path = Path(__file__).parent / "templates"
+    templates = Jinja2Templates(directory=str(engine_templates_path))
+
+    # Setup markdown processor
+    markdown_processor = setup_markdown_processor()
+
+    # Mount static files
+    engine_static_path = Path(__file__).parent / "static"
+    if engine_static_path.exists():
+        app.mount("/static/engine", StaticFiles(directory=str(engine_static_path)), name="engine")
+
+    # Mount site-specific assets
+    site_assets_path = settings.foundry_site_path / "assets"
+    if site_assets_path.exists():
+        app.mount("/assets", StaticFiles(directory=str(site_assets_path)), name="assets")
+
+    # Mount site theme CSS
+    site_theme_path = settings.foundry_site_path / "theme"
+    if site_theme_path.exists():
+        app.mount("/theme", StaticFiles(directory=str(site_theme_path)), name="theme")
+
+    # Store configuration in app state
+    app.state.settings = settings
+    app.state.site_config = site_config
+    app.state.templates = templates
+    app.state.markdown = markdown_processor
+
+    # Include routers
+    app.include_router(pages.router)
+    app.include_router(contact.router)
+
+    # Health check endpoint
+    @app.get("/health")
+    async def health_check() -> dict[str, str]:
+        """Health check endpoint for monitoring."""
+        return {"status": "healthy", "service": "foundry-engine"}
+
+    # Global exception handler
+    @app.exception_handler(Exception)
+    async def global_exception_handler(request: Request, exc: Exception) -> JSONResponse:
+        """Handle uncaught exceptions."""
+        logger.error(f"Unhandled exception: {exc}", exc_info=True)
+        if settings.foundry_env == "development":
+            return JSONResponse(
+                status_code=500,
+                content={"detail": str(exc), "type": type(exc).__name__},
+            )
+        return JSONResponse(
+            status_code=500,
+            content={"detail": "Internal server error"},
+        )
+
+    logger.info("Foundry Engine initialization complete")
+    return app

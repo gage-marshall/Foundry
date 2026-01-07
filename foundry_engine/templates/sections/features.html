@@ -1,0 +1,35 @@
+<section class="section-features">
+    <div class="features-container">
+        {% if content %}
+            <div class="features-intro">
+                {{ content|safe }}
+            </div>
+        {% endif %}
+
+        <div class="features-grid" style="--columns: {{ columns }};">
+            {% for feature in features %}
+                <div class="feature-card card-{{ card_style }}">
+                    {% if feature.icon %}
+                        <div class="feature-icon icon-{{ icon_style }}">
+                            {{ feature.icon|safe }}
+                        </div>
+                    {% endif %}
+
+                    {% if feature.title %}
+                        <h3 class="feature-title">{{ feature.title }}</h3>
+                    {% endif %}
+
+                    {% if feature.description %}
+                        <p class="feature-description">{{ feature.description }}</p>
+                    {% endif %}
+
+                    {% if feature.link %}
+                        <a href="{{ feature.link.url }}" class="feature-link">
+                            {{ feature.link.text or 'Learn more' }} →
+                        </a>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
