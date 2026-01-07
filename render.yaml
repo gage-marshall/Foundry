@@ -7,7 +7,7 @@ services:
     region: oregon
     plan: starter
     buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn main:app -c gunicorn.conf.py
+    startCommand: gunicorn main:app -c gunicorn.conf.py --bind 0.0.0.0:$PORT
     envVars:
       - key: FOUNDRY_ENV
         value: production
