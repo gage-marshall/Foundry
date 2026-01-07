@@ -101,6 +101,21 @@ def create_app() -> FastAPI:
         """Health check endpoint for monitoring."""
         return {"status": "healthy", "service": "foundry-engine"}
 
+    # Startup event
+    @app.on_event("startup")
+    async def startup_event() -> None:
+        """Called when application starts."""
+        logger.info(f"Foundry Engine starting - Environment: {settings.foundry_env.value}")
+        logger.info(f"Serving site: {site_config.site.name}")
+
+    # Shutdown event
+    @app.on_event("shutdown")
+    async def shutdown_event() -> None:
+        """Called when application shuts down - cleanup resources."""
+        logger.info("Foundry Engine shutting down gracefully...")
+        # Add any cleanup tasks here (close connections, etc.)
+        logger.info("Shutdown complete")
+
     # Global exception handler
     @app.exception_handler(Exception)
     async def global_exception_handler(request: Request, exc: Exception) -> JSONResponse:

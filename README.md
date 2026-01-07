@@ -204,7 +204,16 @@ SMTP_USERNAME=your-username
 SMTP_PASSWORD=your-password
 ```
 
-## Deployment to Render
+## Deployment
+
+### Production Deployment to Render
+
+Foundry uses **Gunicorn** with **Uvicorn workers** for production deployment, providing:
+- ✅ Multiple worker processes for reliability
+- ✅ Automatic worker restart on failure
+- ✅ Graceful shutdown handling
+- ✅ Zero-downtime deployments
+- ✅ Optimized for async workloads
 
 1. **Push to Git**
 ```bash
@@ -218,15 +227,48 @@ git push origin main
 - Create a new Web Service on Render
 - Connect your repository
 - Render will detect `render.yaml` automatically
+- Automatically uses Gunicorn configuration
 
 3. **Configure environment variables**
 Set these in the Render dashboard:
-- `SECRET_KEY`
+- `SECRET_KEY` (auto-generated or set manually)
 - `BREVO_API_KEY` (or your chosen email provider)
+- `GUNICORN_WORKERS` (optional, auto-calculated by default)
 - Any other sensitive configuration
 
 4. **Deploy**
-Render will automatically build and deploy your site!
+Render will automatically build and deploy your site with Gunicorn!
+
+### Manual Production Deployment
+
+For VPS or other hosting:
+
+```bash
+# Linux/Mac
+./start.sh
+
+# Windows
+.\start.ps1
+
+# Or directly with gunicorn
+gunicorn main:app -c gunicorn.conf.py
+```
+
+### Gunicorn Configuration
+
+The `gunicorn.conf.py` file provides optimized settings:
+- **Workers**: Auto-calculated (2-4 per CPU core, max 8)
+- **Worker Class**: `uvicorn.workers.UvicornWorker` (ASGI support)
+- **Timeout**: 30 seconds
+- **Max Requests**: 1000 per worker (prevents memory leaks)
+- **Graceful Timeout**: 30 seconds
+- **Preload App**: Enabled (faster startup, memory sharing)
+
+Override workers with environment variable:
+```bash
+export GUNICORN_WORKERS=4
+gunicorn main:app -c gunicorn.conf.py
+```
 
 ## Security Configuration
 
@@ -274,11 +316,8 @@ mypy foundry_engine/
 
 ## License
 
-MIT License - see LICENSE file for details
+Proprietary source-available - see LICENSE file for details
 
-## Contributing
-
-Contributions welcome! Please open an issue or PR.
 
 ---
 
