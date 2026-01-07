@@ -74,6 +74,7 @@ def render_sections(request: Request, page_config: Any) -> list[str]:
 @router.get("/", response_class=HTMLResponse)
 async def render_homepage(request: Request) -> str:
     """Render the homepage."""
+    logger.info(f"Homepage request received from {request.client.host if request.client else 'unknown'}")
     return await render_page(request, "home")
 
 
@@ -89,9 +90,13 @@ async def render_page(request: Request, page_slug: str) -> str:
     site_path = request.app.state.settings.foundry_site_path
     site_config = request.app.state.site_config
 
+    logger.info(f"Attempting to render page: {page_slug}")
+    logger.info(f"Available pages: {site_config.pages}")
+
     # Check if page exists in site config
     if page_slug not in site_config.pages:
-        raise HTTPException(status_code=404, detail="Page not found")
+        logger.warning(f"Page '{page_slug}' not found in site config. Available: {site_config.pages}")
+        raise HTTPException(status_code=404, detail=f"Page not found: {page_slug}")
 
     try:
         # Load page configuration

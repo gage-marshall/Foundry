@@ -30,17 +30,24 @@ def create_app() -> FastAPI:
     logger.info(f"Starting Foundry Engine in {settings.foundry_env.value} mode")
 
     # Verify site path exists
+    site_path_abs = settings.foundry_site_path.absolute()
+    logger.info(f"Looking for site at: {site_path_abs}")
+
     if not settings.foundry_site_path.exists():
+        logger.error(f"Site path does not exist: {site_path_abs}")
+        logger.error(f"Current working directory: {Path.cwd()}")
+        logger.error(f"Directory contents: {list(Path.cwd().iterdir())}")
         raise FileNotFoundError(
-            f"Site path does not exist: {settings.foundry_site_path.absolute()}"
+            f"Site path does not exist: {site_path_abs}"
         )
 
     # Load site configuration
     try:
         site_config = load_site_config(settings.foundry_site_path)
         logger.info(f"Loaded site configuration for: {site_config.site.name}")
+        logger.info(f"Available pages: {site_config.pages}")
     except Exception as e:
-        logger.error(f"Failed to load site configuration: {e}")
+        logger.error(f"Failed to load site configuration: {e}", exc_info=True)
         raise
 
     # Create FastAPI app
@@ -91,15 +98,16 @@ def create_app() -> FastAPI:
     app.state.templates = templates
     app.state.markdown = markdown_processor
 
-    # Include routers
-    app.include_router(pages.router)
-    app.include_router(contact.router)
-
-    # Health check endpoint
+    # Health check endpoints (MUST be before routers with catch-all routes)
     @app.get("/health")
+    @app.get("/healthz")
     async def health_check() -> dict[str, str]:
         """Health check endpoint for monitoring."""
         return {"status": "healthy", "service": "foundry-engine"}
+
+    # Include routers (pages router has catch-all /{page_slug})
+    app.include_router(pages.router)
+    app.include_router(contact.router)
 
     # Startup event
     @app.on_event("startup")
