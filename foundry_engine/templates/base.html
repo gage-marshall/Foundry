@@ -50,6 +50,9 @@
 
     <!-- Critical CSS Inline (above-the-fold styles) -->
     <style>
+        /* Alpine.js Cloak - Hide until Alpine loads */
+        [x-cloak]{display:none!important}
+
         /* Reset & Base */
         *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
         html{font-size:16px;scroll-behavior:smooth}
@@ -62,6 +65,9 @@
         /* Navigation Critical */
         .nav-top-ribbon{position:sticky;top:0;z-index:50;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.1);transition:all 0.3s}
         .nav-container{max-width:1280px;margin:0 auto;padding:0 1rem;display:flex;justify-content:space-between;align-items:center;height:64px}
+
+        /* Hide mobile menu by default */
+        .nav-mobile-menu,.nav-mobile-overlay{display:none}
 
         /* Main Content */
         .main-content{min-height:calc(100vh - 64px)}

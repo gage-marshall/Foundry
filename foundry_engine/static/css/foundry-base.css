@@ -129,6 +129,14 @@ h1, h2, h3, h4, h5, h6 {
     color: var(--color-text);
 }
 
+/* Explicitly override browser default h1 sizing in sections (fixes Chrome deprecation warning) */
+section h1,
+article h1,
+aside h1,
+nav h1 {
+    font-size: var(--text-5xl);
+}
+
 h1 { font-size: var(--text-5xl); }
 h2 { font-size: var(--text-4xl); }
 h3 { font-size: var(--text-3xl); }
@@ -137,7 +145,7 @@ h5 { font-size: var(--text-xl); }
 h6 { font-size: var(--text-lg); }
 
 p {
-    margin-bottom: var(--spacing-md);
+    margin: 0 0 var(--spacing-md) 0;
 }
 
 a {
@@ -176,7 +184,16 @@ a:hover {
 .main-content {
     min-height: 100vh;
     /* Prevent layout shift by reserving space */
-    contain: layout;
+    contain: layout style;
+    /* Optimize for mobile */
+    will-change: auto;
+}
+
+/* Mobile-specific containment */
+@media (max-width: 768px) {
+    .main-content {
+        contain: layout style paint;
+    }
 }
 
 /* ============================================
@@ -348,6 +365,13 @@ a:hover {
     padding: var(--spacing-3xl) var(--spacing-xl);
     z-index: calc(var(--z-sticky) + 1);
     overflow-y: auto;
+    /* Hide by default until Alpine.js loads */
+    display: none;
+}
+
+/* Show when Alpine.js is loaded and controlling visibility */
+[x-cloak] .nav-mobile-menu {
+    display: none;
 }
 
 .nav-mobile-menu .nav-items {
@@ -365,6 +389,8 @@ a:hover {
     inset: 0;
     background: rgba(0, 0, 0, 0.5);
     z-index: var(--z-sticky);
+    /* Hide by default until Alpine.js loads */
+    display: none;
 }
 
 .nav-active-badge {
