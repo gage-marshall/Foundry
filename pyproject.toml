@@ -2,10 +2,10 @@
 name = "foundry-engine"
 version = "0.1.0"
 description = "A modular FastAPI-based static site engine optimized for security, reliability, and speed"
-authors = [{name = "Foundry Team"}]
+authors = [{name = "Foundry Technologies"}]
 readme = "README.md"
 requires-python = ">=3.11"
-license = {text = "MIT"}
+license = {text = "Proprietary"}
 
 dependencies = [
     "fastapi>=0.109.0",

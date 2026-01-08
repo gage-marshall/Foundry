@@ -25,47 +25,64 @@ A modern, secure, and blazingly fast static site engine built with FastAPI. Desi
 
 ## Quick Start
 
-### Prerequisites
-- Python 3.11+
-- pip or poetry
+Foundry Engine can be used in two ways:
 
-### Installation
+### Option A: Monorepo (Development/Testing)
 
-1. **Clone the repository**
-```bash
-git clone <repository-url>
-cd foundry
-```
+1. **Clone and setup**
+   ```bash
+   git clone <repository-url>
+   cd foundry
+   python -m venv .venv
+   source .venv/bin/activate  # Windows: .venv\Scripts\activate
+   pip install -r requirements.txt
+   ```
 
-2. **Create virtual environment**
-```bash
-python -m venv .venv
-source .venv/bin/activate  # On Windows: .venv\Scripts\activate
-```
+2. **Configure**
+   ```bash
+   cp .env.example .env
+   # Edit .env with your configuration
+   ```
 
-3. **Install dependencies**
-```bash
-pip install -r requirements.txt
-```
-
-4. **Configure environment**
-```bash
-cp .env.example .env
-# Edit .env with your configuration
-```
-
-5. **Run development server**
-```bash
-python main.py
-```
+3. **Run**
+   ```bash
+   python main.py
+   ```
 
 Visit `http://localhost:8000` to see your site!
 
+### Option B: As Dependency (Recommended for Production)
+
+**Perfect for separating engine from site content in production.**
+
+1. **Install from GitHub** (in your site repo)
+   ```bash
+   pip install git+ssh://git@github.com/yourorg/foundry-engine.git@main
+   ```
+
+2. **Create site entry point**
+   ```python
+   # main.py
+   from pathlib import Path
+   from foundry_engine import create_app
+
+   app = create_app(site_path=Path(__file__).parent)
+   ```
+
+3. **Run your site**
+   ```bash
+   python main.py
+   ```
+
+📚 See [INTEGRATION.md](docs/INTEGRATION.md) for complete setup guide.
+
 ## Project Structure
 
+### Monorepo Structure (Development)
 ```
 foundry/
-├── foundry_engine/          # Core engine (reusable across sites)
+├── foundry_engine/          # Core engine (Python package)
+│   ├── __init__.py         # Exports create_app()
 │   ├── app.py              # FastAPI application factory
 │   ├── config.py           # Configuration models
 │   ├── security/           # Security modules
@@ -77,7 +94,9 @@ foundry/
 │   └── utils/              # Utilities
 │
 ├── sites/                  # Site-specific content
-│   └── example_site/
+│   └── example_site/       # Ready to move to separate repo
+│       ├── main.py         # Standalone entry point
+│       ├── pyproject.toml  # Defines engine dependency
 │       ├── config.yaml     # Site configuration
 │       ├── content/
 │       │   ├── pages/      # Page definitions (YAML)
@@ -86,9 +105,27 @@ foundry/
 │       │   └── custom.css  # Site theme
 │       └── assets/         # Images, etc.
 │
-├── main.py                 # Application entry point
-├── requirements.txt        # Dependencies
-└── render.yaml            # Render deployment config
+├── docs/
+│   ├── INTEGRATION.md      # Using as dependency guide
+│   ├── STYLING.md          # Styling and content guide
+│   └── ...
+├── main.py                 # Example entry point
+├── pyproject.toml          # Engine package definition
+└── requirements.txt        # Engine dependencies
+```
+
+### Separate Repo Structure (Production)
+```
+[foundry-engine]            ← Engine repository
+└── foundry_engine/         (Imported as dependency)
+
+[my-website]                ← Site repository
+├── main.py                 (Imports foundry-engine)
+├── pyproject.toml          (References engine from GitHub)
+├── config.yaml
+├── content/
+├── theme/
+└── assets/
 ```
 
 ## Creating a New Site
@@ -314,10 +351,38 @@ ruff check foundry_engine/
 mypy foundry_engine/
 ```
 
+## Using Foundry as a Dependency
+
+### For New Sites
+
+See [INTEGRATION.md](docs/INTEGRATION.md) for complete guide on:
+- Setting up a site repository that imports Foundry Engine
+- Installing from private GitHub repositories
+- Deployment with SSH keys and deploy keys
+- Version pinning strategies
+- Troubleshooting
+
+### Example Implementation
+
+Check out `sites/example_site/` which demonstrates:
+- Standalone entry point (`main.py`)
+- Dependency configuration (`pyproject.toml`, `requirements.txt`)
+- Site-specific environment setup (`.env.example`)
+- Complete documentation (`README.md`)
+
+This directory is ready to be moved to its own repository!
+
+## Documentation
+
+- [Integration Guide](docs/INTEGRATION.md) - Using as dependency
+- [Styling Guide](docs/STYLING.md) - Customization and content
+- [Quick Start](QUICKSTART.md) - Get started fast
+- [Development Guide](DEVELOPMENT.md) - Contributing
+- [Deployment Guide](DEPLOYMENT.md) - Production deployment
+
 ## License
 
 Proprietary source-available - see LICENSE file for details
-
 
 ---
 

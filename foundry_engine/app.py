@@ -20,10 +20,31 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def create_app() -> FastAPI:
-    """Create and configure the FastAPI application."""
+def create_app(site_path: Path | None = None) -> FastAPI:
+    """Create and configure the FastAPI application.
+
+    Args:
+        site_path: Optional path to site directory. If provided, overrides
+                   FOUNDRY_SITE_PATH environment variable. Enables programmatic
+                   usage when importing engine as a dependency.
+
+    Returns:
+        Configured FastAPI application instance.
+
+    Example:
+        # Using environment variable (traditional)
+        app = create_app()
+
+        # Using explicit path (when imported as dependency)
+        from pathlib import Path
+        app = create_app(site_path=Path(__file__).parent / "my_site")
+    """
     # Load settings
     settings = FoundrySettings()
+
+    # Override site path if provided programmatically
+    if site_path is not None:
+        settings.foundry_site_path = site_path
 
     # Set log level from settings
     logging.getLogger().setLevel(settings.log_level)
