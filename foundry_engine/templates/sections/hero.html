@@ -1,29 +1,73 @@
 <section class="section-hero{% if parallax %} section-parallax{% endif %}"
-         style="height: {{ height }};">
+         style="min-height: {{ height }};"
+         x-data="{ loaded: false }"
+         x-init="setTimeout(() => loaded = true, 100)">
+
+    <!-- Background Elements -->
     {% if background_image %}
         <div class="hero-background"
-             style="background-image: url('{{ background_image }}'); opacity: {{ 1 - overlay_opacity }};"></div>
+             style="background-image: url('{{ background_image }}');"
+             :class="{ 'hero-background-loaded': loaded }"></div>
+        <div class="hero-overlay" style="opacity: {{ overlay_opacity }};"></div>
     {% endif %}
 
     {% if background_video %}
-        <video class="hero-video" autoplay muted loop playsinline>
+        <video class="hero-video" autoplay muted loop playsinline preload="auto">
             <source src="{{ background_video }}" type="video/mp4">
+            Your browser does not support video backgrounds.
         </video>
         <div class="hero-overlay" style="opacity: {{ overlay_opacity }};"></div>
     {% endif %}
 
-    <div class="hero-content" style="text-align: {{ text_align }};">
-        <div class="hero-text">
-            {{ content|safe }}
-        </div>
+    <!-- Animated Background Pattern (Optional) -->
+    <div class="hero-pattern" aria-hidden="true"></div>
 
-        {% if cta_button %}
-            <div class="hero-cta">
-                <a href="{{ cta_button.url }}"
-                   class="btn btn-{{ cta_button.style or 'primary' }}">
-                    {{ cta_button.text }}
-                </a>
+    <!-- Content -->
+    <div class="hero-content" style="text-align: {{ text_align }};">
+        <div class="hero-content-inner">
+            <div class="hero-text"
+                 x-transition:enter="transition ease-out duration-1000 delay-300"
+                 x-transition:enter-start="opacity-0 transform translate-y-8"
+                 x-transition:enter-end="opacity-100 transform translate-y-0">
+                {{ content|safe }}
             </div>
-        {% endif %}
+
+            {% if cta_button %}
+                <div class="hero-cta"
+                     x-transition:enter="transition ease-out duration-1000 delay-600"
+                     x-transition:enter-start="opacity-0 transform translate-y-8"
+                     x-transition:enter-end="opacity-100 transform translate-y-0">
+                    <a href="{{ cta_button.url }}"
+                       class="btn btn-{{ cta_button.style or 'primary' }} btn-hero"
+                       x-data="{ hover: false }"
+                       @mouseenter="hover = true"
+                       @mouseleave="hover = false">
+                        <span class="btn-text">{{ cta_button.text }}</span>
+                        <svg class="btn-arrow" :class="{ 'btn-arrow-hover': hover }" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                            <polyline points="12 5 19 12 12 19"></polyline>
+                        </svg>
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Scroll Indicator -->
+    <div class="hero-scroll-indicator"
+         x-transition:enter="transition ease-out duration-1000 delay-900"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100">
+        <div class="scroll-mouse">
+            <div class="scroll-wheel"></div>
+        </div>
+        <span class="scroll-text">Scroll to explore</span>
+    </div>
+
+    <!-- Floating Elements (Decorative) -->
+    <div class="hero-floating-elements" aria-hidden="true">
+        <span class="floating-element floating-element-1"></span>
+        <span class="floating-element floating-element-2"></span>
+        <span class="floating-element floating-element-3"></span>
     </div>
 </section>

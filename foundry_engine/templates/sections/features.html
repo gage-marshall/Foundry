@@ -1,35 +1,61 @@
 <section class="section-features">
     <div class="features-container">
         {% if content %}
-            <div class="features-intro">
+            <div class="features-intro" data-aos="fade-up">
                 {{ content|safe }}
             </div>
         {% endif %}
 
         <div class="features-grid" style="--columns: {{ columns }};">
             {% for feature in features %}
-                <div class="feature-card card-{{ card_style }}">
+                <div class="feature-card card-{{ card_style }}"
+                     x-data="{ hover: false }"
+                     @mouseenter="hover = true"
+                     @mouseleave="hover = false"
+                     data-aos="fade-up"
+                     data-aos-delay="{{ loop.index0 * 100 }}">
+
                     {% if feature.icon %}
-                        <div class="feature-icon icon-{{ icon_style }}">
-                            {{ feature.icon|safe }}
+                        <div class="feature-icon icon-{{ icon_style }}"
+                             :class="{ 'feature-icon-hover': hover }">
+                            <div class="feature-icon-bg"></div>
+                            <div class="feature-icon-content">
+                                {{ feature.icon|safe }}
+                            </div>
                         </div>
                     {% endif %}
 
-                    {% if feature.title %}
-                        <h3 class="feature-title">{{ feature.title }}</h3>
-                    {% endif %}
+                    <div class="feature-content">
+                        {% if feature.title %}
+                            <h3 class="feature-title">{{ feature.title }}</h3>
+                        {% endif %}
 
-                    {% if feature.description %}
-                        <p class="feature-description">{{ feature.description }}</p>
-                    {% endif %}
+                        {% if feature.description %}
+                            <p class="feature-description">{{ feature.description }}</p>
+                        {% endif %}
 
-                    {% if feature.link %}
-                        <a href="{{ feature.link.url }}" class="feature-link">
-                            {{ feature.link.text or 'Learn more' }} →
-                        </a>
-                    {% endif %}
+                        {% if feature.link %}
+                            <a href="{{ feature.link.url }}"
+                               class="feature-link"
+                               :class="{ 'feature-link-hover': hover }">
+                                <span class="feature-link-text">{{ feature.link.text or 'Learn more' }}</span>
+                                <svg class="feature-link-arrow" :class="{ 'feature-link-arrow-hover': hover }" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                    <polyline points="12 5 19 12 12 19"></polyline>
+                                </svg>
+                            </a>
+                        {% endif %}
+                    </div>
+
+                    <!-- Decorative Element -->
+                    <div class="feature-card-glow" :class="{ 'feature-card-glow-active': hover }"></div>
                 </div>
             {% endfor %}
         </div>
+    </div>
+
+    <!-- Background Decoration -->
+    <div class="features-decoration" aria-hidden="true">
+        <div class="features-decoration-grid"></div>
     </div>
 </section>

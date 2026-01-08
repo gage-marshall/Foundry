@@ -1,47 +1,89 @@
-<div class="nav-top-ribbon{% if sticky %} nav-sticky{% endif %}" x-data="{ mobileMenuOpen: false }">
+<div class="nav-top-ribbon{% if sticky %} nav-sticky{% endif %}" x-data="{ mobileMenuOpen: false, scrolled: false }" @scroll.window="scrolled = (window.pageYOffset > 20)" :class="{ 'nav-scrolled': scrolled }">
     <div class="nav-container">
-        <div class="nav-brand">
+        <div class="nav-brand" data-aos="fade-right">
             {% if logo %}
-                <a href="/">
-                    <img src="{{ logo }}" alt="{{ logo_alt }}" class="nav-logo">
+                <a href="/" class="nav-logo-link" aria-label="Home">
+                    <img src="{{ logo }}" alt="{{ logo_alt }}" class="nav-logo" loading="eager">
                 </a>
             {% else %}
-                <a href="/" class="nav-logo-text">{{ logo_alt }}</a>
+                <a href="/" class="nav-logo-text" aria-label="Home">{{ logo_alt }}</a>
             {% endif %}
         </div>
 
         <!-- Desktop Navigation -->
-        <ul class="nav-items nav-desktop">
+        <ul class="nav-items nav-desktop" role="list" data-aos="fade-left">
             {% for item in items %}
                 <li class="nav-item{% if item.is_active %} nav-active{% endif %}">
-                    <a href="{{ item.url }}" class="nav-link">
-                        {% if item.icon %}<span class="nav-icon">{{ item.icon }}</span>{% endif %}
-                        {{ item.text }}
+                    <a href="{{ item.url }}"
+                       class="nav-link"
+                       {% if item.is_active %}aria-current="page"{% endif %}>
+                        {% if item.icon %}<span class="nav-icon" aria-hidden="true">{{ item.icon }}</span>{% endif %}
+                        <span class="nav-link-text">{{ item.text }}</span>
+                        {% if item.is_active %}<span class="nav-active-indicator"></span>{% endif %}
                     </a>
                 </li>
             {% endfor %}
         </ul>
 
         <!-- Mobile Menu Toggle -->
-        <button @click="mobileMenuOpen = !mobileMenuOpen" class="nav-mobile-toggle" aria-label="Toggle menu">
-            <span x-show="!mobileMenuOpen">☰</span>
-            <span x-show="mobileMenuOpen">✕</span>
+        <button
+            @click="mobileMenuOpen = !mobileMenuOpen"
+            class="nav-mobile-toggle"
+            aria-label="Toggle menu"
+            :aria-expanded="mobileMenuOpen"
+            aria-controls="mobile-menu">
+            <span class="hamburger-icon" :class="{ 'open': mobileMenuOpen }">
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+            </span>
         </button>
     </div>
 
     <!-- Mobile Navigation -->
-    <div x-show="mobileMenuOpen"
-         x-transition
-         class="nav-mobile-menu">
-        <ul class="nav-items">
+    <div
+        x-show="mobileMenuOpen"
+        x-transition:enter="transition ease-out duration-300"
+        x-transition:enter-start="opacity-0 transform -translate-y-4"
+        x-transition:enter-end="opacity-100 transform translate-y-0"
+        x-transition:leave="transition ease-in duration-200"
+        x-transition:leave-start="opacity-100 transform translate-y-0"
+        x-transition:leave-end="opacity-0 transform -translate-y-4"
+        @click.away="mobileMenuOpen = false"
+        class="nav-mobile-menu"
+        id="mobile-menu"
+        role="navigation">
+        <ul class="nav-items" role="list">
             {% for item in items %}
-                <li class="nav-item{% if item.is_active %} nav-active{% endif %}">
-                    <a href="{{ item.url }}" class="nav-link">
-                        {% if item.icon %}<span class="nav-icon">{{ item.icon }}</span>{% endif %}
-                        {{ item.text }}
+                <li class="nav-item{% if item.is_active %} nav-active{% endif %}"
+                    x-data="{ show: false }"
+                    x-intersect="show = true"
+                    x-transition:enter="transition ease-out duration-300 delay-{{ loop.index0 * 50 }}"
+                    x-transition:enter-start="opacity-0 transform translate-x-4"
+                    x-transition:enter-end="opacity-100 transform translate-x-0">
+                    <a href="{{ item.url }}"
+                       class="nav-link"
+                       @click="mobileMenuOpen = false"
+                       {% if item.is_active %}aria-current="page"{% endif %}>
+                        {% if item.icon %}<span class="nav-icon" aria-hidden="true">{{ item.icon }}</span>{% endif %}
+                        <span class="nav-link-text">{{ item.text }}</span>
+                        {% if item.is_active %}<span class="nav-active-badge">•</span>{% endif %}
                     </a>
                 </li>
             {% endfor %}
         </ul>
     </div>
+
+    <!-- Overlay for mobile menu -->
+    <div
+        x-show="mobileMenuOpen"
+        x-transition:enter="transition ease-out duration-300"
+        x-transition:enter-start="opacity-0"
+        x-transition:enter-end="opacity-100"
+        x-transition:leave="transition ease-in duration-200"
+        x-transition:leave-start="opacity-100"
+        x-transition:leave-end="opacity-0"
+        @click="mobileMenuOpen = false"
+        class="nav-mobile-overlay"
+        aria-hidden="true"></div>
 </div>

@@ -1,23 +1,44 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="theme-color" content="#6366f1">
+    <meta name="color-scheme" content="light">
 
     <title>{% block title %}{{ page.title }} - {{ site.name }}{% endblock %}</title>
 
+    <!-- SEO Meta Tags -->
     <meta name="description" content="{% block description %}{{ page.meta_description or site.description }}{% endblock %}">
     {% if page.meta_keywords %}<meta name="keywords" content="{{ page.meta_keywords }}">{% endif %}
+    <meta name="author" content="{{ site.name }}">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="{{ request.url }}">
 
-    <!-- Open Graph / Social Media -->
+    <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ request.url }}">
+    <meta property="og:site_name" content="{{ site.name }}">
     <meta property="og:title" content="{{ page.og_title or page.title }}">
     <meta property="og:description" content="{{ page.og_description or page.meta_description or site.description }}">
     {% if page.og_image or site.og_image %}<meta property="og:image" content="{{ page.og_image or site.og_image }}">{% endif %}
 
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ page.og_title or page.title }}">
+    <meta name="twitter:description" content="{{ page.og_description or page.meta_description or site.description }}">
+    {% if page.og_image or site.og_image %}<meta name="twitter:image" content="{{ page.og_image or site.og_image }}">{% endif %}
+
     <!-- Favicon -->
-    {% if site.favicon %}<link rel="icon" href="{{ site.favicon }}">{% endif %}
+    {% if site.favicon %}
+    <link rel="icon" type="image/x-icon" href="{{ site.favicon }}">
+    <link rel="apple-touch-icon" href="{{ site.favicon }}">
+    {% endif %}
+
+    <!-- Preconnect to External Resources -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="preconnect" href="https://unpkg.com" crossorigin>
 
     <!-- Core Engine CSS -->
     <link rel="stylesheet" href="/static/engine/css/foundry-base.css">
@@ -26,27 +47,79 @@
     <link rel="stylesheet" href="/theme/custom.css">
 
     <!-- HTMX for interactivity -->
-    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.10" defer></script>
 
     <!-- Alpine.js for lightweight JS -->
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.5/dist/cdn.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.5/dist/cdn.min.js" defer></script>
+
+    <!-- Schema.org Markup -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "{{ site.name }}",
+      "url": "{{ request.url.scheme }}://{{ request.url.netloc }}",
+      "description": "{{ site.description }}"
+    }
+    </script>
 
     {% block extra_head %}{% endblock %}
 </head>
-<body>
+<body class="antialiased">
+    <!-- Skip to Main Content (Accessibility) -->
+    <a href="#main-content" class="skip-to-content">Skip to main content</a>
+
     <!-- Navigation -->
-    <nav id="main-navigation" role="navigation">
+    <nav id="main-navigation" role="navigation" aria-label="Main navigation">
         {{ navigation_html|safe }}
     </nav>
 
     <!-- Main Content -->
-    <main id="main-content" role="main">
+    <main id="main-content" role="main" class="main-content">
         {% block content %}{% endblock %}
     </main>
+
+    <!-- Scroll to Top Button -->
+    <button
+        id="scroll-to-top"
+        class="scroll-to-top"
+        aria-label="Scroll to top"
+        x-data="{ show: false }"
+        x-show="show"
+        @scroll.window="show = (window.pageYOffset > 300)"
+        @click="window.scrollTo({ top: 0, behavior: 'smooth' })"
+        x-transition:enter="transition ease-out duration-300"
+        x-transition:enter-start="opacity-0 transform translate-y-4"
+        x-transition:enter-end="opacity-100 transform translate-y-0"
+        x-transition:leave="transition ease-in duration-200"
+        x-transition:leave-start="opacity-100"
+        x-transition:leave-end="opacity-0"
+        style="display: none;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="18 15 12 9 6 15"></polyline>
+        </svg>
+    </button>
 
     <!-- Core Engine JS -->
     <script src="/static/engine/js/foundry.js"></script>
 
     {% block extra_scripts %}{% endblock %}
+
+    <!-- Performance Monitoring -->
+    <script>
+        // Log Core Web Vitals
+        if ('PerformanceObserver' in window) {
+            try {
+                const observer = new PerformanceObserver((list) => {
+                    for (const entry of list.getEntries()) {
+                        console.log(entry.name, entry.startTime);
+                    }
+                });
+                observer.observe({ entryTypes: ['paint', 'largest-contentful-paint'] });
+            } catch (e) {
+                // Silently fail if not supported
+            }
+        }
+    </script>
 </body>
 </html>
