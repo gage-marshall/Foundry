@@ -1,42 +1,51 @@
 <section class="section-testimonials">
     <div class="testimonials-container">
         {% if content %}
-            <div class="testimonials-intro">
+            <div class="testimonials-intro" data-aos="fade-up">
                 {{ content|safe }}
             </div>
         {% endif %}
 
-        <div class="testimonials-{{ layout }}"
-             {% if layout == 'grid' %}style="--columns: {{ columns }};"{% endif %}>
+        <div class="testimonials-grid">
             {% for testimonial in testimonials %}
-                <div class="testimonial-card">
-                    {% if show_ratings and testimonial.rating %}
-                        <div class="testimonial-rating">
-                            {% for i in range(testimonial.rating) %}
-                                <span class="star">★</span>
-                            {% endfor %}
-                        </div>
-                    {% endif %}
+                <div class="testimonial-card"
+                     data-aos="fade-up"
+                     data-aos-delay="{{ loop.index0 * 100 }}">
 
+                    <!-- Quote Icon -->
+                    <div class="testimonial-quote-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M6 17h3l2-4V7H5v6h3zm8 0h3l2-4V7h-6v6h3z"/>
+                        </svg>
+                    </div>
+
+                    <!-- Quote Text -->
                     <blockquote class="testimonial-quote">
-                        {{ testimonial.quote }}
+                        "{{ testimonial.quote }}"
                     </blockquote>
 
+                    <!-- Author Info -->
                     <div class="testimonial-author">
                         {% if testimonial.photo %}
                             <img src="{{ testimonial.photo }}"
-                                 alt="{{ testimonial.name }}"
+                                 alt="{{ testimonial.author or testimonial.name }}"
                                  class="author-photo">
+                        {% else %}
+                            <div class="author-avatar">
+                                {{ (testimonial.author or testimonial.name)[0] }}
+                            </div>
                         {% endif %}
 
                         <div class="author-info">
-                            <div class="author-name">{{ testimonial.name }}</div>
-                            {% if testimonial.title %}
-                                <div class="author-title">{{ testimonial.title }}</div>
-                            {% endif %}
-                            {% if testimonial.company %}
-                                <div class="author-company">{{ testimonial.company }}</div>
-                            {% endif %}
+                            <div class="author-name">{{ testimonial.author or testimonial.name }}</div>
+                            <div class="author-meta">
+                                {% if testimonial.role or testimonial.title %}
+                                    <span class="author-role">{{ testimonial.role or testimonial.title }}</span>
+                                {% endif %}
+                                {% if testimonial.company %}
+                                    <span class="author-company">{{ testimonial.company }}</span>
+                                {% endif %}
+                            </div>
                         </div>
                     </div>
                 </div>

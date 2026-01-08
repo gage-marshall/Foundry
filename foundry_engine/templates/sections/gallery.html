@@ -1,4 +1,4 @@
-<section class="section-gallery">
+<section class="section-gallery" x-data="{ lightboxOpen: false, lightboxImage: '', lightboxAlt: '', lightboxCaption: '' }">
     <div class="gallery-container">
         {% if content %}
             <div class="gallery-intro" data-aos="fade-up">
@@ -8,17 +8,21 @@
 
         <div class="gallery-grid gallery-{{ layout }}"
              style="--columns: {{ columns }}; --gap: {{ gap }};">
-            {% for image in images %}
+            {% for item in images %}
+                {% set image_url = item.url if item is mapping else item %}
+                {% set image_alt = item.alt if item is mapping else captions.get(image_url, '') %}
+                {% set image_caption = item.caption if item is mapping else captions.get(image_url, '') %}
+
                 <div class="gallery-item"
-                     x-data="{ loaded: false, lightboxOpen: false }"
+                     x-data="{ loaded: false }"
                      data-aos="zoom-in"
                      data-aos-delay="{{ loop.index0 * 50 }}">
 
                     <!-- Image -->
                     <div class="gallery-image-wrapper"
-                         @click="{% if lightbox %}lightboxOpen = true{% endif %}">
-                        <img src="{{ image }}"
-                             alt="{{ captions.get(image, '') }}"
+                         @click="{% if lightbox %}lightboxOpen = true; lightboxImage = '{{ image_url }}'; lightboxAlt = '{{ image_alt }}'; lightboxCaption = '{{ image_caption }}'{% endif %}">
+                        <img src="{{ image_url }}"
+                             alt="{{ image_alt }}"
                              class="gallery-image"
                              loading="lazy"
                              @load="loaded = true"
@@ -27,8 +31,8 @@
 
                         <!-- Hover Overlay -->
                         <div class="gallery-overlay">
-                            {% if captions.get(image) %}
-                                <p class="gallery-caption-overlay">{{ captions[image] }}</p>
+                            {% if image_caption %}
+                                <p class="gallery-caption-overlay">{{ image_caption }}</p>
                             {% endif %}
                             {% if lightbox %}
                                 <div class="gallery-zoom-icon">
@@ -44,53 +48,52 @@
                     </div>
 
                     <!-- Caption Below -->
-                    {% if captions.get(image) %}
-                        <p class="gallery-caption">{{ captions[image] }}</p>
-                    {% endif %}
-
-                    <!-- Lightbox Modal -->
-                    {% if lightbox %}
-                        <div x-show="lightboxOpen"
-                             x-transition:enter="transition ease-out duration-300"
-                             x-transition:enter-start="opacity-0"
-                             x-transition:enter-end="opacity-100"
-                             x-transition:leave="transition ease-in duration-200"
-                             x-transition:leave-start="opacity-100"
-                             x-transition:leave-end="opacity-0"
-                             @click="lightboxOpen = false"
-                             @keydown.escape.window="lightboxOpen = false"
-                             class="gallery-lightbox"
-                             role="dialog"
-                             aria-modal="true"
-                             aria-label="Image viewer"
-                             style="display: none;">
-
-                            <!-- Close Button -->
-                            <button @click="lightboxOpen = false"
-                                    class="lightbox-close"
-                                    aria-label="Close lightbox">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                                    <line x1="6" y1="6" x2="18" y2="18"></line>
-                                </svg>
-                            </button>
-
-                            <!-- Image Container -->
-                            <div class="lightbox-content" @click.stop>
-                                <img src="{{ image }}"
-                                     alt="{{ captions.get(image, '') }}"
-                                     class="lightbox-image"
-                                     x-transition:enter="transition ease-out duration-500 delay-100"
-                                     x-transition:enter-start="opacity-0 transform scale-95"
-                                     x-transition:enter-end="opacity-100 transform scale-100">
-                                {% if captions.get(image) %}
-                                    <p class="lightbox-caption">{{ captions[image] }}</p>
-                                {% endif %}
-                            </div>
-                        </div>
+                    {% if image_caption %}
+                        <p class="gallery-caption">{{ image_caption }}</p>
                     {% endif %}
                 </div>
             {% endfor %}
         </div>
     </div>
+
+    <!-- Shared Lightbox Modal (teleported to body to escape stacking context) -->
+    {% if lightbox %}
+        <template x-teleport="body">
+            <div x-show="lightboxOpen"
+                 x-transition:enter="transition ease-out duration-300"
+                 x-transition:enter-start="opacity-0"
+                 x-transition:enter-end="opacity-100"
+                 x-transition:leave="transition ease-in duration-200"
+                 x-transition:leave-start="opacity-100"
+                 x-transition:leave-end="opacity-0"
+                 @click="lightboxOpen = false"
+                 @keydown.escape.window="lightboxOpen = false"
+                 class="gallery-lightbox"
+                 role="dialog"
+                 aria-modal="true"
+                 aria-label="Image viewer">
+
+                <!-- Close Button -->
+                <button @click="lightboxOpen = false"
+                        class="lightbox-close"
+                        aria-label="Close lightbox">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+
+                <!-- Image Container -->
+                <div class="lightbox-content" @click.stop>
+                    <img :src="lightboxImage"
+                         :alt="lightboxAlt"
+                         class="lightbox-image"
+                         x-transition:enter="transition ease-out duration-500 delay-100"
+                         x-transition:enter-start="opacity-0 transform scale-95"
+                         x-transition:enter-end="opacity-100 transform scale-100">
+                    <p class="lightbox-caption" x-show="lightboxCaption" x-text="lightboxCaption"></p>
+                </div>
+            </div>
+        </template>
+    {% endif %}
 </section>

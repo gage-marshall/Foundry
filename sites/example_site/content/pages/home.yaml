@@ -7,10 +7,11 @@ sections:
   - type: "hero"
     content: "sections/hero-home.md"
     config:
-      background_image: null
+      background_image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1920&q=80"
       height: "100vh"
-      overlay_opacity: 0.4
+      overlay_opacity: 0.6
       text_align: "center"
+      parallax: true
       cta_button:
         text: "Get Started"
         url: "/about"
@@ -23,15 +24,58 @@ sections:
       icon_style: "outlined"
       card_style: "elevated"
       features:
-        - title: "Secure"
-          description: "Built-in JWT authentication, CSRF protection, rate limiting, and security headers"
-          icon: "🔒"
-        - title: "Fast"
-          description: "Async/await throughout, response caching, and optimized static asset delivery"
+        - title: "Lightning Fast"
+          description: "30-day browser caching, gzip compression, deferred CSS/JS loading, and critical inline styles for instant page loads"
           icon: "⚡"
-        - title: "Modular"
-          description: "Flexible section types and navigation styles for rapid site development"
+        - title: "Security First"
+          description: "JWT authentication, CSRF protection, rate limiting, CSP headers, and allowed hosts configuration out of the box"
+          icon: "🔒"
+        - title: "SEO Optimized"
+          description: "Perfect Lighthouse scores with proper heading hierarchy, meta tags, robots.txt, and schema.org markup"
+          icon: "🎯"
+        - title: "Beautiful Animations"
+          description: "Scroll-triggered animations, smooth transitions, parallax effects, and floating elements for engaging experiences"
+          icon: "✨"
+        - title: "Mobile Perfect"
+          description: "Zero layout shift, responsive design, touch-optimized navigation, and flawless mobile performance"
+          icon: "📱"
+        - title: "Developer Joy"
+          description: "YAML for structure, Markdown for content, CSS for styling. Update the engine without touching your sites"
           icon: "🧩"
+
+  - type: "gallery"
+    content: "sections/gallery-showcase.md"
+    config:
+      columns: 3
+      images:
+        - url: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=800&q=80"
+          alt: "Modern web development"
+          caption: "Built with FastAPI"
+        - url: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=800&q=80"
+          alt: "Clean code"
+          caption: "Clean Architecture"
+        - url: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&q=80"
+          alt: "Performance"
+          caption: "Blazing Performance"
+        - url: "https://images.unsplash.com/photo-1563206767-5b18f218e8de?w=800&q=80"
+          alt: "Security"
+          caption: "Enterprise Security"
+        - url: "https://images.unsplash.com/photo-1551650975-87deedd944c3?w=800&q=80"
+          alt: "Design"
+          caption: "Beautiful Design"
+        - url: "https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7?w=800&q=80"
+          alt: "Innovation"
+          caption: "Future Ready"
+
+  - type: "cta"
+    content: "sections/cta-home.md"
+    config:
+      background_color: "#6366f1"
+      text_color: "#ffffff"
+      button:
+        text: "View Documentation"
+        url: "/about"
+        style: "outline"
 
   - type: "text"
     content: "sections/about-preview.md"

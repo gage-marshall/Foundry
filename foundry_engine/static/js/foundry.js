@@ -41,16 +41,42 @@
         });
     }
 
-    // Simple parallax effect for hero sections
+    // Smooth parallax effect for hero sections
     const parallaxSections = document.querySelectorAll('.section-parallax');
+
     if (parallaxSections.length > 0) {
-        window.addEventListener('scroll', () => {
+        let ticking = false;
+
+        function updateParallax() {
+            const scrolled = window.pageYOffset;
+
             parallaxSections.forEach(section => {
-                const scrolled = window.pageYOffset;
-                const rate = scrolled * 0.5;
-                section.style.transform = `translate3d(0, ${rate}px, 0)`;
+                const background = section.querySelector('.hero-background');
+                if (background) {
+                    const sectionTop = section.offsetTop;
+                    const sectionHeight = section.offsetHeight;
+
+                    // Only apply parallax when section is in or near viewport
+                    if (scrolled + window.innerHeight > sectionTop && scrolled < sectionTop + sectionHeight) {
+                        // Background moves up slower than scroll (0.3x speed)
+                        // Creates depth illusion - background "stays behind" as you scroll
+                        const parallaxOffset = (scrolled - sectionTop) * -0.3;
+                        background.style.transform = `translate3d(0, ${parallaxOffset}px, 0)`;
+                    }
+                }
             });
-        });
+            ticking = false;
+        }
+
+        window.addEventListener('scroll', () => {
+            if (!ticking) {
+                requestAnimationFrame(updateParallax);
+                ticking = true;
+            }
+        }, { passive: true });
+
+        // Initial call
+        updateParallax();
     }
 
     // CSRF token helper for forms

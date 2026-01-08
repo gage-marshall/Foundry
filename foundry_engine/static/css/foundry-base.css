@@ -36,6 +36,7 @@
     --spacing-xl: 2rem;
     --spacing-2xl: 3rem;
     --spacing-3xl: 4rem;
+    --spacing-4xl: 6rem;
 
     /* Typography */
     --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
@@ -168,6 +169,17 @@ a {
 
 a:hover {
     color: var(--color-primary-dark);
+}
+
+/* ============================================
+   Section Spacing
+   ============================================ */
+section {
+    margin-bottom: var(--spacing-4xl);
+}
+
+section:last-child {
+    margin-bottom: 0;
 }
 
 /* ============================================
@@ -418,12 +430,16 @@ a:hover {
 
 .hero-background {
     position: absolute;
-    inset: 0;
+    top: -30%;
+    left: 0;
+    right: 0;
+    bottom: -30%;
+    height: 160%;
+    width: 100%;
     background-size: cover;
-    background-position: center;
+    background-position: center center;
     background-repeat: no-repeat;
-    transform: scale(1);
-    transition: transform 10s ease-out;
+    will-change: transform;
 }
 
 .hero-background-loaded {
@@ -995,6 +1011,7 @@ textarea.form-control {
     overflow: hidden;
     border-radius: var(--radius-lg);
     background: var(--color-bg-alt);
+    aspect-ratio: 4 / 3;
 }
 
 .gallery-image {
@@ -1004,7 +1021,6 @@ textarea.form-control {
     display: block;
     transition: all var(--transition-slow);
     transform: scale(1);
-    opacity: 0;
 }
 
 .gallery-image-loaded {
@@ -1053,7 +1069,7 @@ textarea.form-control {
     text-align: center;
 }
 
-/* Lightbox */
+/* Lightbox (teleported to body level via Alpine x-teleport) */
 .gallery-lightbox {
     position: fixed;
     inset: 0;
@@ -1061,7 +1077,7 @@ textarea.form-control {
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: var(--z-modal);
+    z-index: 9999;
     padding: var(--spacing-xl);
 }
 
@@ -1286,6 +1302,138 @@ textarea.form-control {
         height: 40px;
         bottom: var(--spacing-md);
         right: var(--spacing-md);
+    }
+}
+
+/* ============================================
+   Testimonials Section
+   ============================================ */
+.section-testimonials {
+    padding: var(--spacing-4xl) var(--spacing-xl);
+    background: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%);
+    position: relative;
+}
+
+.testimonials-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.testimonials-intro {
+    text-align: center;
+    margin-bottom: var(--spacing-4xl);
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.testimonials-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: var(--spacing-2xl);
+}
+
+.testimonial-card {
+    background: white;
+    padding: var(--spacing-2xl);
+    border-radius: var(--radius-2xl);
+    box-shadow: var(--shadow-lg);
+    position: relative;
+    transition: all var(--transition-base);
+    display: flex;
+    flex-direction: column;
+}
+
+.testimonial-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px rgba(99, 102, 241, 0.15);
+}
+
+.testimonial-quote-icon {
+    color: var(--color-primary);
+    opacity: 0.2;
+    margin-bottom: var(--spacing-lg);
+}
+
+.testimonial-quote {
+    font-size: var(--text-lg);
+    line-height: 1.7;
+    color: var(--color-text);
+    margin: 0 0 var(--spacing-2xl) 0;
+    flex-grow: 1;
+    font-style: italic;
+}
+
+.testimonial-author {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding-top: var(--spacing-lg);
+    border-top: 2px solid var(--color-border);
+}
+
+.author-photo {
+    width: 56px;
+    height: 56px;
+    border-radius: var(--radius-full);
+    object-fit: cover;
+    border: 3px solid var(--color-primary);
+}
+
+.author-avatar {
+    width: 56px;
+    height: 56px;
+    border-radius: var(--radius-full);
+    background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--text-2xl);
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.author-info {
+    flex: 1;
+}
+
+.author-name {
+    font-weight: 700;
+    font-size: var(--text-lg);
+    color: var(--color-text);
+    margin-bottom: var(--spacing-xs);
+}
+
+.author-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    font-size: var(--text-sm);
+    color: var(--color-text-light);
+}
+
+.author-role {
+    font-weight: 600;
+    color: var(--color-primary);
+}
+
+.author-company {
+    font-weight: 500;
+}
+
+.author-company::before {
+    content: "@ ";
+    opacity: 0.5;
+}
+
+@media (max-width: 768px) {
+    .testimonials-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .testimonial-card {
+        padding: var(--spacing-xl);
     }
 }
 
