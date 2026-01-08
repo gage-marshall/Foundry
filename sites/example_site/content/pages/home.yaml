@@ -7,7 +7,7 @@ sections:
   - type: "hero"
     content: "sections/hero-home.md"
     config:
-      background_image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1920&q=80"
+      background_image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1920&q=80&fm=webp"
       height: "100vh"
       overlay_opacity: 0.6
       text_align: "center"
@@ -48,22 +48,22 @@ sections:
     config:
       columns: 3
       images:
-        - url: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=800&q=80"
+        - url: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=800&q=80&fm=webp"
           alt: "Modern web development"
           caption: "Built with FastAPI"
-        - url: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=800&q=80"
+        - url: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=800&q=80&fm=webp"
           alt: "Clean code"
           caption: "Clean Architecture"
-        - url: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&q=80"
+        - url: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&q=80&fm=webp"
           alt: "Performance"
           caption: "Blazing Performance"
-        - url: "https://images.unsplash.com/photo-1563206767-5b18f218e8de?w=800&q=80"
+        - url: "https://images.unsplash.com/photo-1563206767-5b18f218e8de?w=800&q=80&fm=webp"
           alt: "Security"
           caption: "Enterprise Security"
-        - url: "https://images.unsplash.com/photo-1551650975-87deedd944c3?w=800&q=80"
+        - url: "https://images.unsplash.com/photo-1551650975-87deedd944c3?w=800&q=80&fm=webp"
           alt: "Design"
           caption: "Beautiful Design"
-        - url: "https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7?w=800&q=80"
+        - url: "https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7?w=800&q=80&fm=webp"
           alt: "Innovation"
           caption: "Future Ready"
 

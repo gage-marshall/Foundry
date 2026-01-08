@@ -7,7 +7,7 @@ sections:
   - type: "hero"
     content: "sections/hero-about.md"
     config:
-      background_image: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=1920&q=80"
+      background_image: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=1920&q=80&fm=webp"
       height: "60vh"
       overlay_opacity: 0.7
       text_align: "center"
