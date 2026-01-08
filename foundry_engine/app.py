@@ -77,20 +77,22 @@ def create_app() -> FastAPI:
     # Setup markdown processor
     markdown_processor = setup_markdown_processor()
 
-    # Mount static files
+    # Mount static files with custom StaticFiles class for caching
+    from foundry_engine.utils.static import CachedStaticFiles
+    
     engine_static_path = Path(__file__).parent / "static"
     if engine_static_path.exists():
-        app.mount("/static/engine", StaticFiles(directory=str(engine_static_path)), name="engine")
+        app.mount("/static/engine", CachedStaticFiles(directory=str(engine_static_path)), name="engine")
 
     # Mount site-specific assets
     site_assets_path = settings.foundry_site_path / "assets"
     if site_assets_path.exists():
-        app.mount("/assets", StaticFiles(directory=str(site_assets_path)), name="assets")
+        app.mount("/assets", CachedStaticFiles(directory=str(site_assets_path)), name="assets")
 
     # Mount site theme CSS
     site_theme_path = settings.foundry_site_path / "theme"
     if site_theme_path.exists():
-        app.mount("/theme", StaticFiles(directory=str(site_theme_path)), name="theme")
+        app.mount("/theme", CachedStaticFiles(directory=str(site_theme_path)), name="theme")
 
     # Store configuration in app state
     app.state.settings = settings

@@ -36,20 +36,60 @@
     <link rel="apple-touch-icon" href="{{ site.favicon }}">
     {% endif %}
 
-    <!-- Preconnect to External Resources -->
+    <!-- DNS Prefetch & Preconnect to External Resources -->
+    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+    <link rel="dns-prefetch" href="https://unpkg.com">
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
     <link rel="preconnect" href="https://unpkg.com" crossorigin>
 
-    <!-- Core Engine CSS -->
-    <link rel="stylesheet" href="/static/engine/css/foundry-base.css">
+    <!-- Preload Critical Assets -->
+    <link rel="preload" href="/static/engine/css/foundry-base.css" as="style">
+    <link rel="preload" href="/theme/custom.css" as="style">
+    <link rel="preload" href="https://unpkg.com/htmx.org@1.9.10" as="script">
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/alpinejs@3.13.5/dist/cdn.min.js" as="script">
 
-    <!-- Site Theme CSS -->
-    <link rel="stylesheet" href="/theme/custom.css">
+    <!-- Critical CSS Inline (above-the-fold styles) -->
+    <style>
+        /* Reset & Base */
+        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+        html{font-size:16px;scroll-behavior:smooth}
+        body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen,Ubuntu,Cantarell,sans-serif;line-height:1.6;color:#1f2937;background:#fff;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
 
-    <!-- HTMX for interactivity -->
+        /* Skip Link */
+        .skip-to-content{position:absolute;top:-40px;left:0;background:#6366f1;color:#fff;padding:8px;z-index:100;text-decoration:none;border-radius:0 0 4px 0}
+        .skip-to-content:focus{top:0}
+
+        /* Navigation Critical */
+        .nav-top-ribbon{position:sticky;top:0;z-index:50;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.1);transition:all 0.3s}
+        .nav-container{max-width:1280px;margin:0 auto;padding:0 1rem;display:flex;justify-content:space-between;align-items:center;height:64px}
+
+        /* Main Content */
+        .main-content{min-height:calc(100vh - 64px)}
+
+        /* Container */
+        .container{max-width:1280px;margin:0 auto;padding:0 1rem}
+
+        /* Hero Critical */
+        .hero-section{position:relative;min-height:90vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#fff;overflow:hidden}
+    </style>
+
+    <!-- Preload Critical Fonts (if using custom fonts) -->
+    <!-- <link rel="preload" href="/assets/fonts/custom-font.woff2" as="font" type="font/woff2" crossorigin> -->
+
+    <!-- Deferred CSS (non-critical) -->
+    <link rel="preload" href="/static/engine/css/foundry-base.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="/static/engine/css/foundry-base.css"></noscript>
+
+    <link rel="preload" href="/theme/custom.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="/theme/custom.css"></noscript>
+
+    <!-- CSS Loading Polyfill for older browsers -->
+    <script>
+        !function(e){"use strict";var t=function(t,n,o){var i,r=e.document,a=r.createElement("link");if(n)i=n;else{var l=(r.body||r.getElementsByTagName("head")[0]).childNodes;i=l[l.length-1]}var d=r.styleSheets;a.rel="stylesheet",a.href=t,a.media="only x",function e(t){if(r.body)return t();setTimeout(function(){e(t)})}(function(){i.parentNode.insertBefore(a,n?i:i.nextSibling)});var f=function(e){for(var t=a.href,n=d.length;n--;)if(d[n].href===t)return e();setTimeout(function(){f(e)})};return a.addEventListener&&a.addEventListener("load",o),a.onloadcssdefined=f,f(o),a};"undefined"!=typeof exports?exports.loadCSS=t:e.loadCSS=t}("undefined"!=typeof global?global:this);
+    </script>
+
+    <!-- Deferred JavaScript -->
     <script src="https://unpkg.com/htmx.org@1.9.10" defer></script>
-
-    <!-- Alpine.js for lightweight JS -->
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.5/dist/cdn.min.js" defer></script>
 
     <!-- Schema.org Markup -->
@@ -100,8 +140,8 @@
         </svg>
     </button>
 
-    <!-- Core Engine JS -->
-    <script src="/static/engine/js/foundry.js"></script>
+    <!-- Core Engine JS (deferred) -->
+    <script src="/static/engine/js/foundry.js" defer></script>
 
     {% block extra_scripts %}{% endblock %}
 
