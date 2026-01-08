@@ -115,6 +115,20 @@ def create_app() -> FastAPI:
         favicon_url = site_config.site.favicon or "/assets/favicon.svg"
         return RedirectResponse(url=favicon_url, status_code=301)
 
+    # Robots.txt
+    @app.get("/robots.txt")
+    async def robots_txt() -> Response:
+        """Serve robots.txt for search engine crawlers."""
+        from fastapi.responses import PlainTextResponse
+
+        # Generate robots.txt content
+        robots_content = f"""User-agent: *
+Allow: /
+
+Sitemap: {site_config.site.domain if site_config.site.domain else ''}/sitemap.xml
+"""
+        return PlainTextResponse(content=robots_content.strip())
+
     # Include routers (pages router has catch-all /{page_slug})
     app.include_router(pages.router)
     app.include_router(contact.router)

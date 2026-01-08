@@ -377,13 +377,6 @@ a:hover {
     padding: var(--spacing-3xl) var(--spacing-xl);
     z-index: calc(var(--z-sticky) + 1);
     overflow-y: auto;
-    /* Hide by default until Alpine.js loads */
-    display: none;
-}
-
-/* Show when Alpine.js is loaded and controlling visibility */
-[x-cloak] .nav-mobile-menu {
-    display: none;
 }
 
 .nav-mobile-menu .nav-items {
@@ -401,8 +394,6 @@ a:hover {
     inset: 0;
     background: rgba(0, 0, 0, 0.5);
     z-index: var(--z-sticky);
-    /* Hide by default until Alpine.js loads */
-    display: none;
 }
 
 .nav-active-badge {
