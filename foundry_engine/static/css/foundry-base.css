@@ -125,20 +125,40 @@ body.antialiased {
 h1, h2, h3, h4, h5, h6 {
     font-weight: 700;
     line-height: 1.2;
-    margin: 0 0 var(--spacing-md) 0;
     color: var(--color-text);
+}
+
+/* Fix Chrome H1UserAgentFontSizeInSection deprecation - use :where() for zero specificity */
+:where(h1) {
+    margin-block: 0.67em;
+    font-size: 2em;
 }
 
 h1 {
     font-size: var(--text-5xl);
-    display: block;
+    margin-block: 0 var(--spacing-md);
 }
 
-h2 { font-size: var(--text-4xl); }
-h3 { font-size: var(--text-3xl); }
-h4 { font-size: var(--text-2xl); }
-h5 { font-size: var(--text-xl); }
-h6 { font-size: var(--text-lg); }
+h2 {
+    font-size: var(--text-4xl);
+    margin-block: 0 var(--spacing-md);
+}
+h3 {
+    font-size: var(--text-3xl);
+    margin-block: 0 var(--spacing-md);
+}
+h4 {
+    font-size: var(--text-2xl);
+    margin-block: 0 var(--spacing-md);
+}
+h5 {
+    font-size: var(--text-xl);
+    margin-block: 0 var(--spacing-md);
+}
+h6 {
+    font-size: var(--text-lg);
+    margin-block: 0 var(--spacing-md);
+}
 
 p {
     margin: 0 0 var(--spacing-md) 0;
