@@ -4,7 +4,7 @@ import logging
 from pathlib import Path
 
 from fastapi import FastAPI, Request
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, RedirectResponse, Response
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
@@ -106,6 +106,14 @@ def create_app() -> FastAPI:
     async def health_check() -> dict[str, str]:
         """Health check endpoint for monitoring."""
         return {"status": "healthy", "service": "foundry-engine"}
+
+    # Favicon redirect (handle default browser request for /favicon.ico)
+    @app.get("/favicon.ico")
+    async def favicon_redirect() -> Response:
+        """Redirect default favicon.ico request to configured favicon."""
+        from fastapi.responses import RedirectResponse
+        favicon_url = site_config.site.favicon or "/assets/favicon.svg"
+        return RedirectResponse(url=favicon_url, status_code=301)
 
     # Include routers (pages router has catch-all /{page_slug})
     app.include_router(pages.router)

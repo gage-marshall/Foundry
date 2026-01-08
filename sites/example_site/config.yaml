@@ -2,7 +2,7 @@ site:
   name: "Example Site"
   domain: "example.com"
   description: "A beautiful static site powered by Foundry Engine"
-  favicon: "assets/images/favicon.ico"
+  favicon: "/assets/favicon.svg"
 
 security:
   allowed_hosts:
