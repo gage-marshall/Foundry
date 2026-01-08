@@ -122,22 +122,17 @@ body.antialiased {
 /* ============================================
    Typography
    ============================================ */
-/* Fix Chrome H1UserAgentFontSizeInSection deprecation */
-/* Must be defined before any other h1 rules to establish consistent baseline */
-:where(h1) {
-    margin-block: 0.67em;
-    font-size: 2em;
-}
-
 h1, h2, h3, h4, h5, h6 {
     font-weight: 700;
     line-height: 1.2;
     color: var(--color-text);
 }
 
+/* Fix Chrome H1UserAgentFontSizeInSection deprecation */
+/* Must explicitly define both font-size AND margin-block for all h1 elements */
 h1 {
-    font-size: var(--text-5xl) !important;
-    margin-block: 0 var(--spacing-md) !important;
+    font-size: var(--text-5xl);
+    margin-block: 0 var(--spacing-md);
 }
 
 h2 {
