@@ -125,7 +125,7 @@ body.antialiased {
 h1, h2, h3, h4, h5, h6 {
     font-weight: 700;
     line-height: 1.2;
-    margin-bottom: var(--spacing-md);
+    margin: 0 0 var(--spacing-md) 0;
     color: var(--color-text);
 }
 
@@ -175,6 +175,8 @@ a:hover {
    ============================================ */
 .main-content {
     min-height: 100vh;
+    /* Prevent layout shift by reserving space */
+    contain: layout;
 }
 
 /* ============================================
@@ -467,8 +469,12 @@ a:hover {
     align-items: center;
     gap: var(--spacing-sm);
     color: white;
-    opacity: 0.8;
+    opacity: 0;
     z-index: 2;
+    /* Reserve space to prevent layout shift */
+    width: 60px;
+    height: 60px;
+    will-change: opacity;
 }
 
 .scroll-mouse {
