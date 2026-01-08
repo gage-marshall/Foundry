@@ -58,13 +58,18 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
     def _add_security_headers(self, response: Response) -> None:
         """Add security headers to response."""
         # Content Security Policy
+        # Note: Alpine.js requires both 'unsafe-eval' and 'unsafe-inline' for:
+        # - 'unsafe-eval': Reactive expressions in x-data, x-bind, x-show, etc.
+        # - 'unsafe-inline': Event handlers like @click, @submit, etc.
+        # This is a documented Alpine.js limitation: https://alpinejs.dev/advanced/csp
         csp_directives = [
             "default-src 'self'",
-            "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://unpkg.com",
+            "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://unpkg.com https://www.google.com https://www.gstatic.com",
             "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com",
             "font-src 'self' https://fonts.gstatic.com",
             "img-src 'self' data: https:",
-            "connect-src 'self'",
+            "connect-src 'self' https://cdn.jsdelivr.net https://unpkg.com",
+            "object-src 'none'",
             "frame-ancestors 'none'",
             "base-uri 'self'",
             "form-action 'self'",
@@ -80,7 +85,7 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         # Other security headers
         response.headers["X-Content-Type-Options"] = "nosniff"
         response.headers["X-Frame-Options"] = "DENY"
-        response.headers["X-XSS-Protection"] = "1; mode=block"
+        # X-XSS-Protection is deprecated - removed as it's superseded by CSP
         response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
         response.headers["Permissions-Policy"] = (
             "accelerometer=(), camera=(), geolocation=(), gyroscope=(), "

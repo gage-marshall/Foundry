@@ -106,6 +106,14 @@ async def render_page(request: Request, page_slug: str) -> str:
         current_path = "/" if page_slug == "home" else f"/{page_slug}"
         navigation_html = render_navigation(request, current_path)
 
+        # Extract hero image for preloading (first hero section with background_image)
+        hero_image = None
+        for section_config in page_config.sections:
+            if section_config.type == "hero" and section_config.config:
+                hero_image = section_config.config.get("background_image")
+                if hero_image:
+                    break
+
         # Render sections
         sections_html = render_sections(request, page_config)
 
@@ -118,6 +126,7 @@ async def render_page(request: Request, page_slug: str) -> str:
             page=page_config.page,
             navigation_html=navigation_html,
             sections=sections_html,
+            hero_image=hero_image,
         )
 
     except FileNotFoundError:

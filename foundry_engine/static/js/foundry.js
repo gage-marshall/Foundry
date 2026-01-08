@@ -100,5 +100,24 @@
         }
     });
 
+    // Initialize AOS (Animate On Scroll) when loaded
+    if (typeof AOS !== 'undefined') {
+        AOS.init({ duration: 800, easing: 'ease-out', once: true, offset: 100 });
+    }
+
+    // Performance Monitoring - Log Core Web Vitals
+    if ('PerformanceObserver' in window) {
+        try {
+            const observer = new PerformanceObserver((list) => {
+                for (const entry of list.getEntries()) {
+                    console.log(entry.name, entry.startTime);
+                }
+            });
+            observer.observe({ entryTypes: ['paint', 'largest-contentful-paint'] });
+        } catch (e) {
+            // Silently fail if not supported
+        }
+    }
+
     console.log('Foundry Engine initialized');
 })();

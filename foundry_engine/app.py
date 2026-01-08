@@ -129,6 +129,53 @@ Sitemap: {site_config.site.domain if site_config.site.domain else ''}/sitemap.xm
 """
         return PlainTextResponse(content=robots_content.strip())
 
+    # Sitemap.xml
+    @app.get("/sitemap.xml")
+    async def sitemap_xml() -> Response:
+        """Generate sitemap.xml from all site pages."""
+        from datetime import datetime
+        from fastapi.responses import Response
+
+        # Get base domain
+        base_url = site_config.site.domain or "http://localhost:8000"
+        if not base_url.startswith("http"):
+            base_url = f"https://{base_url}"
+        base_url = base_url.rstrip("/")
+
+        # Build sitemap XML
+        urls = []
+        for page_slug, page_config in site_config.pages.items():
+            # Determine URL
+            url = f"{base_url}/{page_slug}" if page_slug != "index" else base_url
+
+            # Use current date as lastmod
+            lastmod = datetime.now().strftime("%Y-%m-%d")
+
+            # Priority: home page = 1.0, others = 0.8
+            priority = "1.0" if page_slug == "index" else "0.8"
+
+            # Frequency
+            changefreq = "weekly"
+
+            urls.append(f"""  <url>
+    <loc>{url}</loc>
+    <lastmod>{lastmod}</lastmod>
+    <changefreq>{changefreq}</changefreq>
+    <priority>{priority}</priority>
+  </url>""")
+
+        # Generate XML
+        sitemap_content = f"""<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+{chr(10).join(urls)}
+</urlset>"""
+
+        return Response(
+            content=sitemap_content,
+            media_type="application/xml",
+            headers={"Cache-Control": "public, max-age=3600"}
+        )
+
     # Include routers (pages router has catch-all /{page_slug})
     app.include_router(pages.router)
     app.include_router(contact.router)
