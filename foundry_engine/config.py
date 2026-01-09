@@ -41,7 +41,7 @@ class FoundrySettings(BaseSettings):
 
     # Application
     foundry_env: Environment = Environment.DEVELOPMENT
-    foundry_site_path: Path = Field(default=Path("./sites/example_site"))
+    foundry_site_path: Optional[Path] = None  # Must be provided by consumer application
     foundry_host: str = "0.0.0.0"
     foundry_port: int = 8000
 

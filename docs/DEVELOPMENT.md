@@ -1,36 +1,84 @@
 # Foundry Engine - Development Guide
 
-Guide for extending and customizing Foundry Engine.
+Guide for contributing to and extending Foundry Engine.
 
 ## Architecture Overview
 
 ### Core Principles
 
-1. **Separation of Concerns**: Engine code is completely separate from site content
+1. **Package-First Design**: Engine is a standalone Python package
 2. **Configuration-Driven**: YAML for structure, Markdown for content, CSS for styling
-3. **Modular Design**: Easy to add new section types, navigation styles, etc.
+3. **Modular Components**: Easy to add new section types, navigation styles, etc.
 4. **Type Safety**: Full Pydantic validation throughout
+5. **Separation of Concerns**: Engine code separate from consumer site content
 
 ### Directory Structure
 
 ```
-foundry_engine/          # Core engine (version controlled)
-├── app.py              # FastAPI app factory
-├── config.py           # Pydantic configuration models
-├── security/           # Security utilities (JWT, CSRF, rate limiting, headers)
-├── mail/               # Email provider implementations
-├── navigation/         # Navigation type renderers
-├── sections/           # Section type renderers
-├── templates/          # Jinja2 templates
-├── routers/            # FastAPI routers
-└── utils/              # Utilities (markdown, yaml)
+foundry-engine/             # Engine repository (this repo)
+├── foundry_engine/         # Core package
+│   ├── __init__.py        # Exports create_app()
+│   ├── app.py             # FastAPI application factory
+│   ├── config.py          # Pydantic configuration models
+│   ├── security/          # Security utilities (JWT, CSRF, rate limiting, headers)
+│   ├── mail/              # Email provider implementations
+│   ├── navigation/        # Navigation type renderers
+│   ├── sections/          # Section type renderers
+│   ├── templates/         # Jinja2 templates
+│   ├── routers/           # FastAPI routers
+│   └── utils/             # Utilities (markdown, yaml)
+├── docs/                  # Engine documentation
+├── pyproject.toml         # Package definition
+├── LICENSE
+└── README.md
+```
 
-sites/                   # Site-specific content (separate from engine)
-└── yoursite/
-    ├── config.yaml     # Site configuration
-    ├── content/        # Page definitions and section content
-    ├── theme/          # Custom CSS
-    └── assets/         # Images, files
+## Development Setup
+
+### Clone and Install
+
+```bash
+# Clone the engine repository
+git clone <engine-repo-url>
+cd foundry-engine
+
+# Create virtual environment
+python -m venv .venv
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
+
+# Install in editable mode with dev dependencies
+pip install -e ".[dev]"
+```
+
+### Development Dependencies
+
+Automatically installed with `[dev]`:
+- `pytest` - Testing framework
+- `pytest-asyncio` - Async test support
+- `black` - Code formatter
+- `ruff` - Fast linter
+- `mypy` - Type checker
+
+## Testing the Engine
+
+### Create a Test Site
+
+To test the engine during development, create a simple test site:
+
+```bash
+# In the engine repository root
+mkdir test-site
+cd test-site
+mkdir -p content/pages content/sections theme assets
+```
+
+Create minimal `config.yaml`, `content/`, and `main.py` that imports the engine.
+
+### Run Test Site
+
+```bash
+# From test-site directory
+python main.py
 ```
 
 ## Adding New Section Types
@@ -108,9 +156,9 @@ SECTION_REGISTRY: dict[str, Type[BaseSection]] = {
 }
 ```
 
-### Step 4: Use in Site
+### Step 4: Test in Consumer Site
 
-Now you can use it in your page YAML:
+Now consumers can use it in their page YAML:
 
 ```yaml
 sections:
@@ -122,17 +170,8 @@ sections:
       plans:
         - name: "Basic"
           price: 9
-          features:
-            - "Feature 1"
-            - "Feature 2"
+          features: ["Feature 1", "Feature 2"]
           cta_url: "/signup?plan=basic"
-        - name: "Pro"
-          price: 29
-          features:
-            - "All Basic features"
-            - "Feature 3"
-            - "Feature 4"
-          cta_url: "/signup?plan=pro"
 ```
 
 ## Adding New Navigation Types
@@ -249,13 +288,13 @@ elif provider_type == MailProvider.SENDGRID:
 
 ## Testing
 
-### Run Tests
+### Run All Tests
 
 ```bash
 pytest
 ```
 
-### Test a Specific Module
+### Test Specific Module
 
 ```bash
 pytest foundry_engine/tests/test_sections.py
@@ -265,6 +304,26 @@ pytest foundry_engine/tests/test_sections.py
 
 ```bash
 pytest --cov=foundry_engine --cov-report=html
+open htmlcov/index.html
+```
+
+### Write Tests
+
+```python
+# foundry_engine/tests/test_pricing.py
+import pytest
+from foundry_engine.sections.pricing import PricingSection
+
+def test_pricing_section_context():
+    section = PricingSection(
+        content_path=None,
+        config={"currency": "€", "plans": [{"name": "Basic", "price": 10}]},
+        site_path=Path("/fake"),
+        markdown_processor=None
+    )
+    context = section.get_context()
+    assert context["currency"] == "€"
+    assert len(context["plans"]) == 1
 ```
 
 ## Code Style
@@ -272,19 +331,31 @@ pytest --cov=foundry_engine --cov-report=html
 ### Format Code
 
 ```bash
+# Format all Python code
 black foundry_engine/
+
+# Check formatting
+black --check foundry_engine/
 ```
 
 ### Lint Code
 
 ```bash
+# Run linter
 ruff check foundry_engine/
+
+# Auto-fix issues
+ruff check --fix foundry_engine/
 ```
 
 ### Type Checking
 
 ```bash
+# Check types
 mypy foundry_engine/
+
+# Check specific file
+mypy foundry_engine/sections/pricing.py
 ```
 
 ## Best Practices
@@ -295,27 +366,31 @@ mypy foundry_engine/
 2. Implement `get_context()` method
 3. Use `get_rendered_content()` for markdown content
 4. Validate config in `validate_config()` if needed
+5. Add type hints for all parameters
 
 ### Templates
 
-1. Use semantic HTML
+1. Use semantic HTML5 elements
 2. Add proper ARIA labels for accessibility
-3. Use CSS classes that can be overridden
+3. Use CSS classes that can be overridden by consumers
 4. Keep templates simple and focused
+5. Document expected context variables
 
 ### Configuration
 
-1. Use Pydantic models for validation
+1. Use Pydantic models for all config validation
 2. Provide sensible defaults
 3. Document config options in docstrings
 4. Use enums for fixed choices
+5. Validate early, fail fast
 
 ### Security
 
-1. Always validate user input
-2. Use CSRF tokens for forms
-3. Apply rate limiting to endpoints
-4. Sanitize HTML output when needed
+1. Always validate user input with Pydantic
+2. Use CSRF tokens for all forms
+3. Apply rate limiting to sensitive endpoints
+4. Sanitize HTML output when rendering user content
+5. Never trust environment variables without validation
 
 ## Debugging
 
@@ -327,7 +402,7 @@ LOG_LEVEL=DEBUG
 
 ### Access Request State
 
-In routes, you can access:
+In routes and sections:
 - `request.app.state.settings` - Environment settings
 - `request.app.state.site_config` - Site configuration
 - `request.app.state.templates` - Jinja2 templates
@@ -335,23 +410,101 @@ In routes, you can access:
 
 ### Common Issues
 
-**Templates not found**: Check that template path matches `template_name`
+**Templates not found**:
+- Check that template path matches `template_name`
+- Verify template exists in `foundry_engine/templates/`
 
-**Section not rendering**: Verify section is registered in `registry.py`
+**Section not rendering**:
+- Verify section is registered in `sections/registry.py`
+- Check for typos in section type name
 
-**Config validation fails**: Check Pydantic models in `config.py`
+**Config validation fails**:
+- Review Pydantic models in `config.py`
+- Check error messages for required fields
+
+## Release Process
+
+### Version Numbering
+
+Use semantic versioning: `MAJOR.MINOR.PATCH`
+
+- **MAJOR**: Breaking changes
+- **MINOR**: New features (backward compatible)
+- **PATCH**: Bug fixes
+
+### Creating a Release
+
+1. Update version in `pyproject.toml`
+2. Update CHANGELOG.md
+3. Run tests: `pytest`
+4. Format code: `black foundry_engine/`
+5. Check types: `mypy foundry_engine/`
+6. Commit changes
+7. Tag release: `git tag v0.2.0`
+8. Push: `git push origin main --tags`
+
+### Release Notes
+
+Document in CHANGELOG.md:
+- New features
+- Bug fixes
+- Breaking changes
+- Migration guide (if needed)
 
 ## Contributing
 
+### Pull Request Process
+
 1. Fork the repository
-2. Create a feature branch
+2. Create a feature branch: `git checkout -b feature/my-feature`
 3. Make your changes
-4. Add tests
-5. Run code style checks
-6. Submit a pull request
+4. Add tests for new functionality
+5. Run code quality checks
+6. Commit with clear messages
+7. Push and create pull request
+8. Address review feedback
+
+### Commit Messages
+
+Use conventional commits:
+- `feat:` New feature
+- `fix:` Bug fix
+- `docs:` Documentation only
+- `style:` Code style (formatting, etc.)
+- `refactor:` Code restructuring
+- `test:` Adding tests
+- `chore:` Maintenance tasks
+
+Example: `feat: add pricing section type`
 
 ## Questions?
 
-- Check existing code for examples
-- Review type hints for parameter types
-- Look at example site for usage patterns
+- Review existing code for examples
+- Check type hints for parameter types
+- Look at Pydantic models for configuration
+- Open an issue for clarification
+
+## Architecture Decisions
+
+### Why Package-First?
+
+- **Separation**: Engine updates don't affect site content
+- **Versioning**: Sites can pin to specific engine versions
+- **Maintainability**: Single codebase for engine improvements
+- **Distribution**: Easy to share across multiple sites
+
+### Why Pydantic?
+
+- **Validation**: Automatic input validation
+- **Type Safety**: Full IDE autocomplete support
+- **Documentation**: Self-documenting config structure
+- **Performance**: Fast validation with Rust backend
+
+### Why Jinja2?
+
+- **Familiar**: Standard Python templating
+- **Powerful**: Rich template inheritance
+- **Safe**: Auto-escaping prevents XSS
+- **Extensible**: Easy to add custom filters
+
+Happy developing! 🛠️

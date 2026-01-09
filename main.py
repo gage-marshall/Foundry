@@ -1,40 +1,36 @@
 """
-Foundry Engine - Main Entry Point
+Foundry Engine - Example Entry Point
 
-A modular FastAPI-based static site engine optimized for security, reliability, and speed.
+This is a minimal example showing how to use Foundry Engine as a package.
+In your own site repository, you would create a similar main.py file.
 
-This file demonstrates two usage patterns:
-
-1. Environment Variable (Default):
-   Set FOUNDRY_SITE_PATH in .env file and call create_app() with no arguments.
-
-2. Programmatic (Recommended when using as dependency):
-   Pass site_path directly to create_app() for explicit configuration.
+Usage in your site repository:
+    1. Install: pip install git+ssh://git@github.com/yourorg/foundry-engine.git@main
+    2. Create main.py that imports foundry_engine
+    3. Pass your site directory path to create_app()
 """
 
 import uvicorn
 from pathlib import Path
-
 from foundry_engine import create_app
 
-# Create the FastAPI application
-#
-# Method 1: Using environment variable (traditional monorepo approach)
-# Loads from FOUNDRY_SITE_PATH in .env file
-app = create_app()
+# For actual usage: your site directory should contain:
+# - config.yaml (site configuration)
+# - content/ (pages and sections)
+# - theme/ (custom CSS)
+# - assets/ (images, etc.)
+site_path = Path(__file__).parent
 
-# Method 2: Using explicit path (recommended when importing as dependency)
-# Uncomment to use:
-# site_path = Path(__file__).parent / "sites" / "example_site"
-# app = create_app(site_path=site_path)
+# Create the FastAPI application with your site path
+app = create_app(site_path=site_path)
 
 if __name__ == "__main__":
-    # Run with uvicorn when executed directly
-    # For production, use: gunicorn main:app -c gunicorn.conf.py
+    # Development server
+    # For production, use: gunicorn main:app -w 4 -k uvicorn.workers.UvicornWorker
     uvicorn.run(
         "main:app",
         host="0.0.0.0",
         port=8000,
-        reload=True,  # Enable auto-reload for development
+        reload=True,
         log_level="info",
     )

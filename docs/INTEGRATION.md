@@ -26,14 +26,15 @@ This guide explains how to use Foundry Engine as an imported dependency from a p
 - ✅ **Easy updates** - Update engine across all sites at once
 - ✅ **Standard workflow** - Use pip like any other dependency
 
-### Two Repository Setup
+### Repository Setup
 
 ```
-[foundry-engine]          ← Engine repository (shared)
+[foundry-engine]          ← Engine repository (installed as package)
 └── foundry_engine/
 
-[my-website]              ← Site repository (your content)
-├── main.py
+[my-website]              ← Your site repository
+├── main.py              (imports foundry_engine)
+├── pyproject.toml       (defines engine dependency)
 ├── config.yaml
 ├── content/
 └── theme/
@@ -45,10 +46,10 @@ This guide explains how to use Foundry Engine as an imported dependency from a p
 
 ### How It Works
 
-1. **Engine Repository**: Contains `foundry_engine/` package
-2. **Site Repository**: Imports engine via `pip install git+ssh://...`
+1. **Engine Repository**: Contains `foundry_engine/` package (this repo)
+2. **Your Site Repository**: Imports engine via `pip install git+ssh://...` or pyproject.toml
 3. **Site Entry Point**: Calls `create_app(site_path=Path(__file__).parent)`
-4. **Deployment**: Platform installs engine automatically from GitHub
+4. **Deployment**: Deployment platform installs engine automatically from GitHub
 
 ### Directory Structure
 
@@ -639,17 +640,18 @@ git+ssh://git@github.com/yourorg/foundry-engine.git@v2.0.0-beta
 
 ## Additional Resources
 
-- [Foundry Engine README](../README.md)
-- [Styling Guide](STYLING.md)
-- [Example Site](../sites/example_site/)
-- [Deployment Guide](DEPLOYMENT.md)
+- [Foundry Engine README](../README.md) - Main documentation
+- [Quick Start Guide](QUICKSTART.md) - Get started fast
+- [Styling Guide](STYLING.md) - Content and customization
+- [Development Guide](DEVELOPMENT.md) - Contributing to the engine
+- [Deployment Guide](DEPLOYMENT.md) - Production deployment
 
 ---
 
 ## Need Help?
 
 - Open an issue in the engine repository
-- Check example_site/ for reference implementation
 - Review this guide's troubleshooting section
+- Check the Quick Start guide for basic setup
 
 **Happy building!** 🚀

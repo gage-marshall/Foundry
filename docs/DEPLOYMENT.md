@@ -1,6 +1,8 @@
 # Foundry Engine - Production Deployment Guide
 
-Complete guide for deploying Foundry Engine to production with Gunicorn.
+Guide for deploying sites that use Foundry Engine as a package.
+
+**Note**: This guide is for deploying **your site** that uses Foundry Engine. The engine itself is installed as a dependency and requires no separate deployment.
 
 ## Architecture
 
@@ -36,37 +38,47 @@ Internet → Load Balancer/Proxy → Gunicorn (Master) → Uvicorn Workers → F
 ### Option 1: Render (Recommended)
 
 **Pros:**
-- Zero configuration (uses `render.yaml`)
+- Simple configuration
 - Automatic SSL certificates
 - Auto-scaling available
 - Git-based deploys
 - Free tier available
 
 **Setup:**
-1. Push code to GitHub/GitLab
-2. Connect repository on Render
-3. Set environment variables
-4. Deploy automatically
 
-**Configuration:**
+1. **Create `render.yaml` in your site repository:**
 ```yaml
-# render.yaml (already configured)
-startCommand: gunicorn main:app -c gunicorn.conf.py
+services:
+  - type: web
+    name: my-website
+    env: python
+    buildCommand: pip install -e .
+    startCommand: gunicorn main:app -w 4 -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:$PORT
+    envVars:
+      - key: FOUNDRY_ENV
+        value: production
+      - key: SECRET_KEY
+        generateValue: true
 ```
+
+2. **Push code to GitHub/GitLab**
+3. **Connect repository on Render**
+4. **Set environment variables** (SECRET_KEY, email provider API keys, etc.)
+5. **Deploy!**
 
 ### Option 2: AWS/GCP/Azure
 
 **Deploy on VM:**
 
 ```bash
-# 1. Clone repository
-git clone <your-repo>
-cd foundry
+# 1. Clone your site repository
+git clone <your-site-repo>
+cd my-website
 
-# 2. Install dependencies
+# 2. Install dependencies (includes engine)
 python -m venv .venv
 source .venv/bin/activate
-pip install -r requirements.txt
+pip install -e .
 
 # 3. Set environment variables
 export SECRET_KEY="your-secret-key"
@@ -74,26 +86,26 @@ export FOUNDRY_ENV="production"
 export BREVO_API_KEY="your-api-key"
 
 # 4. Start with systemd
-sudo cp foundry.service /etc/systemd/system/
-sudo systemctl enable foundry
-sudo systemctl start foundry
+sudo cp my-website.service /etc/systemd/system/
+sudo systemctl enable my-website
+sudo systemctl start my-website
 ```
 
 **Systemd Service File:**
 ```ini
-# /etc/systemd/system/foundry.service
+# /etc/systemd/system/my-website.service
 [Unit]
-Description=Foundry Engine
+Description=My Website (Foundry Engine)
 After=network.target
 
 [Service]
 Type=notify
 User=www-data
 Group=www-data
-WorkingDirectory=/var/www/foundry
-Environment="PATH=/var/www/foundry/.venv/bin"
-EnvironmentFile=/var/www/foundry/.env
-ExecStart=/var/www/foundry/.venv/bin/gunicorn main:app -c gunicorn.conf.py
+WorkingDirectory=/var/www/my-website
+Environment="PATH=/var/www/my-website/.venv/bin"
+EnvironmentFile=/var/www/my-website/.env
+ExecStart=/var/www/my-website/.venv/bin/gunicorn main:app -w 4 -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000
 ExecReload=/bin/kill -s HUP $MAINPID
 KillMode=mixed
 TimeoutStopSec=30
@@ -105,22 +117,21 @@ WantedBy=multi-user.target
 
 ### Option 3: Docker
 
-**Dockerfile:**
+**Dockerfile (in your site repository):**
 ```dockerfile
 FROM python:3.11-slim
 
 WORKDIR /app
 
-# Install dependencies
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Copy application
+# Copy site files
 COPY . .
 
+# Install dependencies (includes foundry-engine)
+RUN pip install --no-cache-dir -e .
+
 # Create non-root user
-RUN useradd -m -u 1000 foundry && chown -R foundry:foundry /app
-USER foundry
+RUN useradd -m -u 1000 appuser && chown -R appuser:appuser /app
+USER appuser
 
 # Expose port
 EXPOSE 8000
@@ -130,7 +141,7 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:8000/health || exit 1
 
 # Start application
-CMD ["gunicorn", "main:app", "-c", "gunicorn.conf.py"]
+CMD ["gunicorn", "main:app", "-w", "4", "-k", "uvicorn.workers.UvicornWorker", "--bind", "0.0.0.0:8000"]
 ```
 
 **docker-compose.yml:**
@@ -138,14 +149,12 @@ CMD ["gunicorn", "main:app", "-c", "gunicorn.conf.py"]
 version: '3.8'
 
 services:
-  foundry:
+  website:
     build: .
     ports:
       - "8000:8000"
     env_file:
       - .env
-    volumes:
-      - ./sites:/app/sites:ro
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
@@ -210,50 +219,49 @@ spec:
 
 ### Worker Count
 
-**Auto-calculated formula:**
+**Formula:**
 ```python
 workers = (2 to 4) × CPU_cores
 ```
 
-**Override:**
+**Set in gunicorn command:**
 ```bash
-export GUNICORN_WORKERS=4
+gunicorn main:app -w 4 -k uvicorn.workers.UvicornWorker
 ```
 
 **Guidelines:**
 - **Low Traffic**: 2-4 workers
 - **Medium Traffic**: 4-8 workers
-- **High Traffic**: 8+ workers (scale horizontally instead)
+- **High Traffic**: 8+ workers (or scale horizontally)
 
-### Timeouts
+### Timeouts & Advanced Config
 
-**Request Timeout** (default: 30s):
+For advanced gunicorn configuration, create `gunicorn_config.py` in your site repository:
+
 ```python
-# gunicorn.conf.py
-timeout = 30  # Increase for slow endpoints
+# gunicorn_config.py
+import multiprocessing
+
+# Workers
+workers = multiprocessing.cpu_count() * 2 + 1
+worker_class = "uvicorn.workers.UvicornWorker"
+
+# Timeouts
+timeout = 30
+graceful_timeout = 30
+keepalive = 5
+
+# Worker lifecycle (prevents memory leaks)
+max_requests = 1000
+max_requests_jitter = 100
+
+# Logging
+accesslog = "-"
+errorlog = "-"
+loglevel = "info"
 ```
 
-**Graceful Timeout** (default: 30s):
-```python
-graceful_timeout = 30  # Time for workers to finish requests
-```
-
-### Memory Management
-
-**Max Requests** (default: 1000):
-```python
-max_requests = 1000  # Restart worker after N requests
-max_requests_jitter = 100  # Add randomness
-```
-
-This prevents memory leaks by restarting workers periodically.
-
-### Connection Limits
-
-**Worker Connections** (default: 1000):
-```python
-worker_connections = 1000  # Max simultaneous clients per worker
-```
+Then run: `gunicorn main:app -c gunicorn_config.py`
 
 ## Monitoring
 

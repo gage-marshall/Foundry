@@ -1,6 +1,6 @@
 # Foundry Engine
 
-A modern, secure, and blazingly fast static site engine built with FastAPI. Designed for rapid deployment of 1-5 page sites with a focus on security, reliability, and speed.
+A modern, secure, and blazingly fast static site engine built with FastAPI. Designed as a **Python package** for rapid deployment of 1-5 page sites with a focus on security, reliability, and speed.
 
 ## Features
 
@@ -23,128 +23,62 @@ A modern, secure, and blazingly fast static site engine built with FastAPI. Desi
 - **Type Safety**: Full type hints with Pydantic models
 - **Clear Separation**: Engine updates don't affect site content
 
+## Installation
+
+Foundry Engine is designed to be installed as a **Python package** in your site repository.
+
+### Install from GitHub
+
+```bash
+# SSH (recommended for private repos)
+pip install git+ssh://git@github.com/yourorg/foundry-engine.git@main
+
+# HTTPS
+pip install git+https://github.com/yourorg/foundry-engine.git@main
+```
+
+### Or via pyproject.toml
+
+```toml
+[project]
+dependencies = [
+    "foundry-engine @ git+ssh://git@github.com/yourorg/foundry-engine.git@main",
+]
+```
+
 ## Quick Start
 
-Foundry Engine can be used in two ways:
+### 1. Create Your Site Repository
 
-### Option A: Monorepo (Development/Testing)
-
-1. **Clone and setup**
-   ```bash
-   git clone <repository-url>
-   cd foundry
-   python -m venv .venv
-   source .venv/bin/activate  # Windows: .venv\Scripts\activate
-   pip install -r requirements.txt
-   ```
-
-2. **Configure**
-   ```bash
-   cp .env.example .env
-   # Edit .env with your configuration
-   ```
-
-3. **Run**
-   ```bash
-   python main.py
-   ```
-
-Visit `http://localhost:8000` to see your site!
-
-### Option B: As Dependency (Recommended for Production)
-
-**Perfect for separating engine from site content in production.**
-
-1. **Install from GitHub** (in your site repo)
-   ```bash
-   pip install git+ssh://git@github.com/yourorg/foundry-engine.git@main
-   ```
-
-2. **Create site entry point**
-   ```python
-   # main.py
-   from pathlib import Path
-   from foundry_engine import create_app
-
-   app = create_app(site_path=Path(__file__).parent)
-   ```
-
-3. **Run your site**
-   ```bash
-   python main.py
-   ```
-
-📚 See [INTEGRATION.md](docs/INTEGRATION.md) for complete setup guide.
-
-## Project Structure
-
-### Monorepo Structure (Development)
-```
-foundry/
-├── foundry_engine/          # Core engine (Python package)
-│   ├── __init__.py         # Exports create_app()
-│   ├── app.py              # FastAPI application factory
-│   ├── config.py           # Configuration models
-│   ├── security/           # Security modules
-│   ├── mail/               # Email providers
-│   ├── navigation/         # Navigation types
-│   ├── sections/           # Section types
-│   ├── templates/          # Jinja2 templates
-│   ├── routers/            # API routes
-│   └── utils/              # Utilities
-│
-├── sites/                  # Site-specific content
-│   └── example_site/       # Ready to move to separate repo
-│       ├── main.py         # Standalone entry point
-│       ├── pyproject.toml  # Defines engine dependency
-│       ├── config.yaml     # Site configuration
-│       ├── content/
-│       │   ├── pages/      # Page definitions (YAML)
-│       │   └── sections/   # Section content (Markdown)
-│       ├── theme/
-│       │   └── custom.css  # Site theme
-│       └── assets/         # Images, etc.
-│
-├── docs/
-│   ├── INTEGRATION.md      # Using as dependency guide
-│   ├── STYLING.md          # Styling and content guide
-│   └── ...
-├── main.py                 # Example entry point
-├── pyproject.toml          # Engine package definition
-└── requirements.txt        # Engine dependencies
-```
-
-### Separate Repo Structure (Production)
-```
-[foundry-engine]            ← Engine repository
-└── foundry_engine/         (Imported as dependency)
-
-[my-website]                ← Site repository
-├── main.py                 (Imports foundry-engine)
-├── pyproject.toml          (References engine from GitHub)
-├── config.yaml
-├── content/
-├── theme/
-└── assets/
-```
-
-## Creating a New Site
-
-1. **Create site directory structure**
 ```bash
-mkdir -p sites/mysite/{content/pages,content/sections,theme,assets/images}
+mkdir my-website
+cd my-website
+mkdir -p content/pages content/sections theme assets/images
 ```
 
-2. **Create config.yaml**
+### 2. Create Entry Point
+
+**File: `main.py`**
+```python
+from pathlib import Path
+from foundry_engine import create_app
+
+# Your site directory contains: config.yaml, content/, theme/, assets/
+app = create_app(site_path=Path(__file__).parent)
+```
+
+### 3. Create Site Configuration
+
+**File: `config.yaml`**
 ```yaml
 site:
-  name: "My Site"
-  domain: "mysite.com"
+  name: "My Website"
+  domain: "mywebsite.com"
   description: "My awesome site"
 
 security:
   allowed_hosts:
-    - "mysite.com"
+    - "mywebsite.com"
     - "*.onrender.com"
 
 navigation:
@@ -157,15 +91,17 @@ navigation:
 
 mail:
   provider: "brevo"
-  from_email: "noreply@mysite.com"
-  contact_recipient: "hello@mysite.com"
+  from_email: "noreply@mywebsite.com"
+  contact_recipient: "hello@mywebsite.com"
 
 pages:
   - home
   - about
 ```
 
-3. **Create page definitions** (e.g., `content/pages/home.yaml`)
+### 4. Create Page Definition
+
+**File: `content/pages/home.yaml`**
 ```yaml
 page:
   slug: "home"
@@ -183,18 +119,64 @@ sections:
         url: "/about"
 ```
 
-4. **Write content** (e.g., `content/sections/hero.md`)
+### 5. Write Content
+
+**File: `content/sections/hero.md`**
 ```markdown
 # Welcome to My Site
 
 ## Making the web beautiful, one site at a time
 ```
 
-5. **Customize theme** (`theme/custom.css`)
+### 6. Customize Theme
+
+**File: `theme/custom.css`**
 ```css
 :root {
   --color-primary: #your-color;
 }
+```
+
+### 7. Run Development Server
+
+```bash
+python main.py
+```
+
+Visit `http://localhost:8000`
+
+## Project Structure
+
+### Your Site Repository
+
+```
+my-website/                 ← Your site repository
+├── main.py                 (Imports foundry-engine)
+├── pyproject.toml          (Defines engine dependency)
+├── .env                    (Environment variables)
+├── config.yaml             (Site configuration)
+├── content/
+│   ├── pages/             (Page definitions - YAML)
+│   └── sections/          (Section content - Markdown)
+├── theme/
+│   └── custom.css         (Site-specific styles)
+└── assets/
+    └── images/            (Images, fonts, etc.)
+```
+
+### Engine Package (Imported)
+
+```
+foundry-engine/            ← Installed as dependency
+└── foundry_engine/
+    ├── app.py            (FastAPI application factory)
+    ├── config.py         (Configuration models)
+    ├── security/         (Security modules)
+    ├── mail/             (Email providers)
+    ├── navigation/       (Navigation types)
+    ├── sections/         (Section types)
+    ├── templates/        (Jinja2 templates)
+    └── routers/          (API routes)
 ```
 
 ## Built-in Section Types
@@ -241,70 +223,35 @@ SMTP_USERNAME=your-username
 SMTP_PASSWORD=your-password
 ```
 
-## Deployment
+## Production Deployment
 
-### Production Deployment to Render
+### Deployment to Render
 
-Foundry uses **Gunicorn** with **Uvicorn workers** for production deployment, providing:
-- ✅ Multiple worker processes for reliability
-- ✅ Automatic worker restart on failure
-- ✅ Graceful shutdown handling
-- ✅ Zero-downtime deployments
-- ✅ Optimized for async workloads
-
-1. **Push to Git**
-```bash
-git init
-git add .
-git commit -m "Initial commit"
-git push origin main
+1. **Create `render.yaml` in your site repo:**
+```yaml
+services:
+  - type: web
+    name: my-website
+    env: python
+    buildCommand: pip install -e .
+    startCommand: gunicorn main:app -w 4 -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:$PORT
 ```
 
-2. **Connect to Render**
-- Create a new Web Service on Render
-- Connect your repository
-- Render will detect `render.yaml` automatically
-- Automatically uses Gunicorn configuration
+2. **Set environment variables in Render dashboard:**
+   - `SECRET_KEY` (auto-generate or set manually)
+   - `BREVO_API_KEY` (or your email provider)
+   - Any other sensitive configuration
 
-3. **Configure environment variables**
-Set these in the Render dashboard:
-- `SECRET_KEY` (auto-generated or set manually)
-- `BREVO_API_KEY` (or your chosen email provider)
-- `GUNICORN_WORKERS` (optional, auto-calculated by default)
-- Any other sensitive configuration
+3. **Deploy!** Render auto-detects and deploys.
 
-4. **Deploy**
-Render will automatically build and deploy your site with Gunicorn!
-
-### Manual Production Deployment
-
-For VPS or other hosting:
+### Manual Deployment
 
 ```bash
-# Linux/Mac
-./start.sh
+# Install dependencies
+pip install -e .
 
-# Windows
-.\start.ps1
-
-# Or directly with gunicorn
-gunicorn main:app -c gunicorn.conf.py
-```
-
-### Gunicorn Configuration
-
-The `gunicorn.conf.py` file provides optimized settings:
-- **Workers**: Auto-calculated (2-4 per CPU core, max 8)
-- **Worker Class**: `uvicorn.workers.UvicornWorker` (ASGI support)
-- **Timeout**: 30 seconds
-- **Max Requests**: 1000 per worker (prevents memory leaks)
-- **Graceful Timeout**: 30 seconds
-- **Preload App**: Enabled (faster startup, memory sharing)
-
-Override workers with environment variable:
-```bash
-export GUNICORN_WORKERS=4
-gunicorn main:app -c gunicorn.conf.py
+# Run with gunicorn
+gunicorn main:app -w 4 -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000
 ```
 
 ## Security Configuration
@@ -324,7 +271,7 @@ RATE_LIMIT_PER_MINUTE=10
 ```
 
 ### Allowed Hosts
-Configure in `sites/yoursite/config.yaml`:
+Configure in `config.yaml`:
 ```yaml
 security:
   allowed_hosts:
@@ -333,7 +280,17 @@ security:
     - "*.onrender.com"
 ```
 
-## Development
+## Engine Development
+
+### Clone Engine Repository
+
+```bash
+git clone <engine-repo-url>
+cd foundry-engine
+python -m venv .venv
+source .venv/bin/activate
+pip install -e ".[dev]"
+```
 
 ### Run Tests
 ```bash
@@ -351,34 +308,37 @@ ruff check foundry_engine/
 mypy foundry_engine/
 ```
 
-## Using Foundry as a Dependency
-
-### For New Sites
-
-See [INTEGRATION.md](docs/INTEGRATION.md) for complete guide on:
-- Setting up a site repository that imports Foundry Engine
-- Installing from private GitHub repositories
-- Deployment with SSH keys and deploy keys
-- Version pinning strategies
-- Troubleshooting
-
-### Example Implementation
-
-Check out `sites/example_site/` which demonstrates:
-- Standalone entry point (`main.py`)
-- Dependency configuration (`pyproject.toml`, `requirements.txt`)
-- Site-specific environment setup (`.env.example`)
-- Complete documentation (`README.md`)
-
-This directory is ready to be moved to its own repository!
-
 ## Documentation
 
-- [Integration Guide](docs/INTEGRATION.md) - Using as dependency
-- [Styling Guide](docs/STYLING.md) - Customization and content
-- [Quick Start](QUICKSTART.md) - Get started fast
-- [Development Guide](DEVELOPMENT.md) - Contributing
-- [Deployment Guide](DEPLOYMENT.md) - Production deployment
+- **[Integration Guide](docs/INTEGRATION.md)** - Complete guide for using as a package
+- **[Quick Start](docs/QUICKSTART.md)** - Get started fast
+- **[Styling Guide](docs/STYLING.md)** - Customization and content
+- **[Development Guide](docs/DEVELOPMENT.md)** - Contributing to the engine
+- **[Deployment Guide](docs/DEPLOYMENT.md)** - Production deployment strategies
+
+## Updating the Engine
+
+### Update to Latest
+
+```bash
+pip install --upgrade --force-reinstall git+ssh://git@github.com/yourorg/foundry-engine.git@main
+```
+
+### Pin to Specific Version
+
+```toml
+# Pin to version tag
+"foundry-engine @ git+ssh://git@github.com/yourorg/foundry-engine.git@v0.1.0"
+
+# Pin to commit hash (maximum stability)
+"foundry-engine @ git+ssh://git@github.com/yourorg/foundry-engine.git@abc123def"
+```
+
+## Version Pinning Strategy
+
+- **Development**: Track `main` branch for latest features
+- **Staging**: Use version tags (e.g., `v0.2.0`)
+- **Production**: Pin to specific commit hashes for stability
 
 ## License
 

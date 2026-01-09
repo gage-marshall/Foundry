@@ -1,33 +1,208 @@
 # Foundry Engine - Quick Start Guide
 
-Get your first site running in 5 minutes!
+Get your first site running in 10 minutes using Foundry Engine as a package!
 
-## Step 1: Install Dependencies
+## Prerequisites
+
+- Python 3.11+
+- Git
+- SSH access to the Foundry Engine repository (or use HTTPS)
+
+## Step 1: Create Your Site Repository
 
 ```bash
-# Create and activate virtual environment
+# Create new directory for your site
+mkdir my-website
+cd my-website
+
+# Initialize git
+git init
+
+# Create directory structure
+mkdir -p content/pages content/sections theme assets/images
+```
+
+## Step 2: Install Foundry Engine
+
+### Option A: Using pyproject.toml (Recommended)
+
+Create `pyproject.toml`:
+```toml
+[project]
+name = "my-website"
+version = "0.1.0"
+requires-python = ">=3.11"
+
+dependencies = [
+    "foundry-engine @ git+ssh://git@github.com/yourorg/foundry-engine.git@main",
+]
+
+[build-system]
+requires = ["setuptools>=68.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+```
+
+Then install:
+```bash
 python -m venv .venv
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
+pip install -e .
+```
 
-# Windows
-.venv\Scripts\activate
+### Option B: Direct Installation
 
-# Linux/Mac
+```bash
+python -m venv .venv
 source .venv/bin/activate
-
-# Install dependencies
-pip install -r requirements.txt
+pip install git+ssh://git@github.com/yourorg/foundry-engine.git@main
 ```
 
-## Step 2: Configure Environment
+## Step 3: Create Entry Point
 
-A development `.env` file has been created for you. For production, update these values:
+Create `main.py`:
+```python
+from pathlib import Path
+from foundry_engine import create_app
 
+# Site path is current directory
+app = create_app(site_path=Path(__file__).parent)
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+```
+
+## Step 4: Configure Your Site
+
+Create `config.yaml`:
+```yaml
+site:
+  name: "My Website"
+  domain: "mywebsite.com"
+  description: "My awesome website"
+
+security:
+  allowed_hosts:
+    - "mywebsite.com"
+    - "localhost"
+    - "127.0.0.1"
+  csrf_enabled: true
+
+navigation:
+  type: "top_ribbon"
+  sticky: true
+  items:
+    - text: "Home"
+      url: "/"
+    - text: "About"
+      url: "/about"
+    - text: "Contact"
+      url: "/contact"
+
+mail:
+  provider: "brevo"
+  from_email: "noreply@mywebsite.com"
+  from_name: "My Website"
+  contact_recipient: "hello@mywebsite.com"
+
+pages:
+  - home
+  - about
+  - contact
+
+theme_css: "theme/custom.css"
+```
+
+## Step 5: Create Environment File
+
+Create `.env`:
 ```env
-SECRET_KEY=your-secret-key-here
+# Application
+FOUNDRY_ENV=development
+
+# Security (generate with: openssl rand -hex 32)
+SECRET_KEY=your-secret-key-here-generate-with-openssl-rand-hex-32
+
+# Email Provider
+MAIL_PROVIDER=brevo
 BREVO_API_KEY=your-brevo-api-key
+
+# Rate Limiting
+RATE_LIMIT_ENABLED=true
+RATE_LIMIT_PER_MINUTE=10
 ```
 
-## Step 3: Run the Server
+## Step 6: Create Your First Page
+
+Create `content/pages/home.yaml`:
+```yaml
+page:
+  slug: "home"
+  title: "Welcome to My Website"
+  meta_description: "Welcome to my awesome website"
+
+sections:
+  - type: "hero"
+    content: "sections/hero.md"
+    config:
+      height: "100vh"
+      text_align: "center"
+      background_color: "#1a1a2e"
+      cta_button:
+        text: "Learn More"
+        url: "/about"
+
+  - type: "features"
+    content: "sections/features.md"
+    config:
+      columns: 3
+      features:
+        - icon: "⚡"
+          title: "Fast"
+          description: "Lightning-fast performance"
+        - icon: "🔒"
+          title: "Secure"
+          description: "Built-in security features"
+        - icon: "🎨"
+          title: "Beautiful"
+          description: "Modern, clean design"
+```
+
+## Step 7: Write Content
+
+Create `content/sections/hero.md`:
+```markdown
+# Welcome to My Website
+
+## Building something amazing
+```
+
+Create `content/sections/features.md`:
+```markdown
+## Our Features
+
+Check out what makes us special
+```
+
+## Step 8: Customize Theme
+
+Create `theme/custom.css`:
+```css
+:root {
+  /* Colors */
+  --color-primary: #6366f1;
+  --color-secondary: #8b5cf6;
+  --color-accent: #ec4899;
+
+  /* Fonts */
+  --font-primary: 'Inter', sans-serif;
+  --font-heading: 'Montserrat', sans-serif;
+}
+
+/* Add your custom styles here */
+```
+
+## Step 9: Run Your Site
 
 ```bash
 python main.py
@@ -35,113 +210,92 @@ python main.py
 
 Visit: http://localhost:8000
 
-## Step 4: Customize Your Site
+## Next Steps
 
-### Edit Site Configuration
-Edit `sites/example_site/config.yaml`:
-- Change site name and domain
-- Update navigation items
-- Configure email recipient
+### Add More Pages
 
-### Edit Page Content
-Edit files in `sites/example_site/content/`:
-- `pages/*.yaml` - Page structure
-- `sections/*.md` - Content
+1. Create page YAML: `content/pages/about.yaml`
+2. Add sections markdown
+3. Already listed in `config.yaml` pages array!
 
-### Customize Theme
-Edit `sites/example_site/theme/custom.css`:
-- Change colors in `:root` variables
-- Add custom styles
+### Customize Styling
 
-## Common Tasks
+Edit `theme/custom.css` to match your brand
 
-### Add a New Page
+### Add Contact Form
 
-1. Create page config:
+Create `content/pages/contact.yaml`:
+```yaml
+page:
+  slug: "contact"
+  title: "Contact Us"
+
+sections:
+  - type: "contact"
+    content: "sections/contact-intro.md"
+    config:
+      fields:
+        - name: "name"
+          type: "text"
+          label: "Your Name"
+          required: true
+        - name: "email"
+          type: "email"
+          label: "Your Email"
+          required: true
+        - name: "message"
+          type: "textarea"
+          label: "Message"
+          required: true
+      submit_text: "Send Message"
+```
+
+### Deploy to Production
+
+See [Deployment Guide](DEPLOYMENT.md) for production deployment options.
+
+## Common Issues
+
+### Module Not Found
+
 ```bash
-# sites/example_site/content/pages/services.yaml
+# Make sure virtual environment is activated
+source .venv/bin/activate
+
+# Reinstall engine
+pip install --force-reinstall git+ssh://git@github.com/yourorg/foundry-engine.git@main
 ```
 
-2. Add to site config:
-```yaml
-pages:
-  - home
-  - about
-  - contact
-  - services  # Add this
-```
+### Config Not Found
 
-3. Add navigation item:
-```yaml
-navigation:
-  items:
-    - text: "Services"
-      url: "/services"
-```
-
-### Change Navigation Style
-
-Edit `sites/example_site/config.yaml`:
-```yaml
-navigation:
-  type: "hamburger"  # or "top_ribbon", "sidebar"
-```
-
-### Configure Email
-
-1. Get API key from [Brevo](https://app.brevo.com/)
-2. Update `.env`:
-```env
-BREVO_API_KEY=your-actual-api-key
-```
-3. Update `sites/example_site/config.yaml`:
-```yaml
-mail:
-  contact_recipient: "your-email@example.com"
-```
-
-## Deploy to Render
-
-1. Push to Git:
+Make sure you're running from the correct directory:
 ```bash
-git init
-git add .
-git commit -m "Initial commit"
-git push origin main
+cd my-website  # Directory containing config.yaml
+python main.py
 ```
 
-2. On Render:
-   - Create new Web Service
-   - Connect your repository
-   - Set environment variables
-   - Deploy!
+### Email Not Working
+
+1. Get API key from your email provider (Brevo, Mailgun, etc.)
+2. Add to `.env` file
+3. Restart server
 
 ## Available Section Types
 
-Use these in your page YAML files:
-
-- `hero` - Hero sections with backgrounds and CTAs
+- `hero` - Hero sections with CTAs
 - `text` - Rich markdown content
-- `features` - Feature grids with icons
+- `features` - Feature grids
 - `gallery` - Photo galleries
 - `contact` - Contact forms
-- `cta` - Call-to-action sections
+- `cta` - Call-to-action
 - `parallax` - Parallax scrolling
 - `testimonials` - Customer testimonials
 - `footer` - Page footers
 
 ## Need Help?
 
-- Check `README.md` for full documentation
-- Review example site in `sites/example_site/`
-- See inline comments in YAML files
-
-## What's Next?
-
-1. Replace example content with yours
-2. Add your branding and colors
-3. Configure email provider
-4. Deploy to Render
-5. Point your domain to Render
+- Check [Integration Guide](INTEGRATION.md) for detailed documentation
+- Review [Styling Guide](STYLING.md) for customization options
+- See [Development Guide](DEVELOPMENT.md) for extending the engine
 
 Happy building! 🚀
