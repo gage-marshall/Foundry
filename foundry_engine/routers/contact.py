@@ -92,6 +92,7 @@ async def handle_contact_form(
     name: str = Form(...),
     email: str = Form(...),
     message: str = Form(...),
+    subject: str = Form(None),  # Optional subject field
     recaptcha_response: str = Form(None, alias="g-recaptcha-response"),
     csrf_valid: bool = Depends(validate_csrf_token),
 ) -> str:
@@ -100,7 +101,10 @@ async def handle_contact_form(
     site_config = request.app.state.site_config
 
     # Log received form data for debugging
-    logger.debug(f"Contact form received - name: {name}, email: {email}, message length: {len(message)}")
+    logger.debug(
+        f"Contact form received - name: {name}, email: {email}, "
+        f"subject: {subject}, message length: {len(message)}"
+    )
 
     # Validate form data
     try:
@@ -118,19 +122,31 @@ async def handle_contact_form(
             return '<div class="alert alert-error">reCAPTCHA verification failed. Please try again.</div>'
 
     # Prepare email
-    subject = f"Contact Form: {site_config.site.name}"
+    email_subject = f"Contact Form: {site_config.site.name}"
+    if subject:
+        email_subject = f"{email_subject} - {subject}"
+
     html_content = f"""
     <h2>New Contact Form Submission</h2>
     <p><strong>Name:</strong> {form_data.name}</p>
     <p><strong>Email:</strong> {form_data.email}</p>
+    """
+    if subject:
+        html_content += f"<p><strong>Subject:</strong> {subject}</p>"
+    html_content += f"""
     <p><strong>Message:</strong></p>
     <p>{form_data.message.replace(chr(10), '<br>')}</p>
     """
+
     text_content = f"""
     New Contact Form Submission
 
     Name: {form_data.name}
     Email: {form_data.email}
+    """
+    if subject:
+        text_content += f"Subject: {subject}\n"
+    text_content += f"""
 
     Message:
     {form_data.message}
@@ -138,7 +154,7 @@ async def handle_contact_form(
 
     email_message = EmailMessage(
         to=site_config.mail.contact_recipient,
-        subject=subject,
+        subject=email_subject,
         html_content=html_content,
         text_content=text_content,
         reply_to=form_data.email,
