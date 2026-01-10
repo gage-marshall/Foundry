@@ -89,22 +89,44 @@ async def verify_recaptcha(recaptcha_response: str, secret_key: str) -> bool:
 @limiter.limit("5/minute")
 async def handle_contact_form(
     request: Request,
-    name: str = Form(...),
-    email: str = Form(...),
-    message: str = Form(...),
-    subject: str = Form(None),  # Optional subject field
-    recaptcha_response: str = Form(None, alias="g-recaptcha-response"),
     csrf_valid: bool = Depends(validate_csrf_token),
 ) -> str:
     """Handle contact form submission."""
     settings = request.app.state.settings
     site_config = request.app.state.site_config
 
-    # Log received form data for debugging
-    logger.debug(
-        f"Contact form received - name: {name}, email: {email}, "
-        f"subject: {subject}, message length: {len(message)}"
-    )
+    # Parse form data manually to handle any custom fields
+    try:
+        form_data_raw = await request.form()
+        form_dict = dict(form_data_raw)
+
+        # Extract required fields
+        name = form_dict.get("name", "").strip()
+        email = form_dict.get("email", "").strip()
+        message = form_dict.get("message", "").strip()
+
+        # Extract optional fields
+        subject = form_dict.get("subject", "").strip()
+        recaptcha_response = form_dict.get("g-recaptcha-response")
+
+        # Log received form data for debugging
+        logger.debug(
+            f"Contact form received - name: {name}, email: {email}, "
+            f"subject: {subject}, message length: {len(message)}, "
+            f"all fields: {list(form_dict.keys())}"
+        )
+
+        # Validate required fields
+        if not name:
+            return '<div class="alert alert-error">Name is required.</div>'
+        if not email:
+            return '<div class="alert alert-error">Email is required.</div>'
+        if not message:
+            return '<div class="alert alert-error">Message is required.</div>'
+
+    except Exception as e:
+        logger.error(f"Error parsing form data: {e}", exc_info=True)
+        return '<div class="alert alert-error">Invalid form data.</div>'
 
     # Validate form data
     try:
