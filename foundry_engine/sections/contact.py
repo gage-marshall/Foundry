@@ -30,4 +30,6 @@ class ContactSection(BaseSection):
             "success_message": self.config.get("success_message", "Thank you! We'll be in touch soon."),
             "error_message": self.config.get("error_message", "Sorry, something went wrong. Please try again."),
             "recaptcha": self.config.get("recaptcha", False),
+            "csrf_token": self.config.get("csrf_token"),
+            "recaptcha_site_key": self.config.get("recaptcha_site_key"),
         }
