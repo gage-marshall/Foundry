@@ -53,6 +53,12 @@ class BrevoMailProvider(BaseMailProvider):
                 response.raise_for_status()
                 logger.info(f"Email sent successfully via Brevo to {message.to}")
                 return True
+        except httpx.HTTPStatusError as e:
+            logger.error(
+                f"Brevo API error {e.response.status_code}: {e.response.text}. "
+                f"Payload: {payload}"
+            )
+            return False
         except httpx.HTTPError as e:
             logger.error(f"Failed to send email via Brevo: {e}")
             return False

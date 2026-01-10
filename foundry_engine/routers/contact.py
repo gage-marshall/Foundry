@@ -99,12 +99,17 @@ async def handle_contact_form(
     settings = request.app.state.settings
     site_config = request.app.state.site_config
 
+    # Log received form data for debugging
+    logger.debug(f"Contact form received - name: {name}, email: {email}, message length: {len(message)}")
+
     # Validate form data
     try:
         form_data = ContactFormData(name=name, email=email, message=message)
     except ValidationError as e:
-        logger.warning(f"Contact form validation error: {e}")
-        return '<div class="alert alert-error">Please check your input and try again.</div>'
+        logger.warning(f"Contact form validation error: {e.errors()}")
+        # Return more specific error message
+        error_details = "; ".join([f"{err['loc'][0]}: {err['msg']}" for err in e.errors()])
+        return f'<div class="alert alert-error">Validation error: {error_details}</div>'
 
     # Verify reCAPTCHA if enabled
     if settings.recaptcha_secret_key and recaptcha_response:
@@ -142,15 +147,21 @@ async def handle_contact_form(
     # Send email
     try:
         mail_provider = get_mail_provider(request)
+        logger.debug(f"Sending email from {email_message.reply_to} to {site_config.mail.contact_recipient}")
         success = await mail_provider.send(email_message)
 
         if success:
             logger.info(f"Contact form submitted successfully from {form_data.email}")
             return '<div class="alert alert-success">Thank you! We\'ll be in touch soon.</div>'
         else:
-            logger.error("Failed to send contact form email")
+            logger.error(
+                f"Failed to send contact form email. "
+                f"Provider: {settings.mail_provider}, "
+                f"From: {site_config.mail.from_email}, "
+                f"To: {site_config.mail.contact_recipient}"
+            )
             return '<div class="alert alert-error">Sorry, something went wrong. Please try again later.</div>'
 
     except Exception as e:
-        logger.error(f"Error processing contact form: {e}", exc_info=True)
+        logger.error(f"Error processing contact form: {type(e).__name__}: {e}", exc_info=True)
         return '<div class="alert alert-error">Sorry, something went wrong. Please try again later.</div>'
