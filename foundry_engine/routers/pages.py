@@ -4,7 +4,7 @@ import logging
 from pathlib import Path
 from typing import Any
 
-from fastapi import APIRouter, HTTPException, Request
+from fastapi import APIRouter, HTTPException, Request, Response
 from fastapi.responses import HTMLResponse
 
 from foundry_engine.config import load_page_config
@@ -34,11 +34,16 @@ def render_navigation(request: Request, current_path: str) -> str:
     return navigation.render(template)
 
 
-def render_sections(request: Request, page_config: Any) -> list[str]:
-    """Render all sections for a page."""
+def render_sections(request: Request, page_config: Any) -> tuple[list[str], str | None]:
+    """Render all sections for a page.
+
+    Returns:
+        Tuple of (rendered_sections, csrf_token). csrf_token is None if no contact form present.
+    """
     site_path = request.app.state.settings.foundry_site_path
     markdown = request.app.state.markdown
     rendered_sections = []
+    csrf_token = None
 
     for section_config in page_config.sections:
         section_class = get_section_class(section_config.type)
@@ -68,11 +73,11 @@ def render_sections(request: Request, page_config: Any) -> list[str]:
 
         rendered_sections.append(section.render(template))
 
-    return rendered_sections
+    return rendered_sections, csrf_token
 
 
 @router.get("/", response_class=HTMLResponse)
-async def render_homepage(request: Request) -> str:
+async def render_homepage(request: Request) -> Response:
     """Render the homepage."""
     logger.info(f"Homepage request received from {request.client.host if request.client else 'unknown'}")
     return await render_page(request, "home")
@@ -80,15 +85,16 @@ async def render_homepage(request: Request) -> str:
 
 @router.get("/{page_slug}", response_class=HTMLResponse)
 @router.get("/{page_slug}/", response_class=HTMLResponse)
-async def render_page_route(request: Request, page_slug: str) -> str:
+async def render_page_route(request: Request, page_slug: str) -> Response:
     """Render a page by slug."""
     return await render_page(request, page_slug)
 
 
-async def render_page(request: Request, page_slug: str) -> str:
+async def render_page(request: Request, page_slug: str) -> Response:
     """Common page rendering logic."""
     site_path = request.app.state.settings.foundry_site_path
     site_config = request.app.state.site_config
+    settings = request.app.state.settings
 
     logger.info(f"Attempting to render page: {page_slug}")
     logger.info(f"Available pages: {site_config.pages}")
@@ -114,13 +120,13 @@ async def render_page(request: Request, page_slug: str) -> str:
                 if hero_image:
                     break
 
-        # Render sections
-        sections_html = render_sections(request, page_config)
+        # Render sections and get CSRF token if contact form present
+        sections_html, csrf_token = render_sections(request, page_config)
 
         # Render page template
         template = request.app.state.templates.get_template("page.html")
 
-        return template.render(
+        html_content = template.render(
             request=request,
             site=site_config.site,
             page=page_config.page,
@@ -128,6 +134,23 @@ async def render_page(request: Request, page_slug: str) -> str:
             sections=sections_html,
             hero_image=hero_image,
         )
+
+        # Create response with HTML content
+        response = HTMLResponse(content=html_content)
+
+        # Set CSRF cookie if contact form is present
+        if csrf_token:
+            logger.debug(f"Setting CSRF cookie for page: {page_slug}")
+            response.set_cookie(
+                key="csrf_token",
+                value=csrf_token,
+                httponly=False,  # Allow JS to read the cookie
+                samesite="lax",  # CSRF protection
+                secure=(settings.foundry_env.value == "production"),  # HTTPS only in production
+                max_age=3600,  # 1 hour
+            )
+
+        return response
 
     except FileNotFoundError:
         logger.error(f"Page configuration not found: {page_slug}")
