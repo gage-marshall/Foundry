@@ -22,14 +22,18 @@ async def validate_csrf_token(
 
     Note: This function manually parses form data to avoid FastAPI's strict
     form validation, which would reject requests with extra form fields.
+    The form data is cached on the request state so it can be reused by the endpoint.
     """
     # Check if CSRF is enabled for this site
     if not request.app.state.site_config.security.csrf_enabled:
         return True
 
     # Parse form data manually to get csrf_token without triggering strict validation
+    # Cache it on the request state so the endpoint handler can reuse it
     try:
-        form_data = await request.form()
+        if not hasattr(request.state, "form_data"):
+            request.state.form_data = await request.form()
+        form_data = request.state.form_data
         csrf_token = form_data.get("csrf_token")
     except Exception as e:
         logger.error(f"Failed to parse form data for CSRF validation: {e}")

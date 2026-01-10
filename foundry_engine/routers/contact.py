@@ -95,9 +95,13 @@ async def handle_contact_form(
     settings = request.app.state.settings
     site_config = request.app.state.site_config
 
-    # Parse form data manually to handle any custom fields
+    # Get form data from request state (cached by CSRF validator)
+    # If CSRF is disabled, parse it here
     try:
-        form_data_raw = await request.form()
+        if hasattr(request.state, "form_data"):
+            form_data_raw = request.state.form_data
+        else:
+            form_data_raw = await request.form()
         form_dict = dict(form_data_raw)
 
         # Extract required fields
