@@ -5,7 +5,7 @@ This is a minimal example showing how to use Foundry Engine as a package.
 In your own site repository, you would create a similar main.py file.
 
 Usage in your site repository:
-    1. Install: pip install git+ssh://git@github.com/yourorg/foundry-engine.git@main
+    1. Install: pip install git+ssh://git@github.com/gage-marshall/Foundry.git@master
     2. Create main.py that imports foundry_engine
     3. Pass your site directory path to create_app()
 """

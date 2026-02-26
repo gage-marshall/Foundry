@@ -16,21 +16,21 @@ Guide for contributing to and extending Foundry Engine.
 
 ```
 foundry-engine/             # Engine repository (this repo)
-├── foundry_engine/         # Core package
-│   ├── __init__.py        # Exports create_app()
-│   ├── app.py             # FastAPI application factory
-│   ├── config.py          # Pydantic configuration models
-│   ├── security/          # Security utilities (JWT, CSRF, rate limiting, headers)
-│   ├── mail/              # Email provider implementations
-│   ├── navigation/        # Navigation type renderers
-│   ├── sections/          # Section type renderers
-│   ├── templates/         # Jinja2 templates
-│   ├── routers/           # FastAPI routers
-│   └── utils/             # Utilities (markdown, yaml)
-├── docs/                  # Engine documentation
-├── pyproject.toml         # Package definition
-├── LICENSE
-└── README.md
+|-- foundry_engine/         # Core package
+|   |-- __init__.py        # Exports create_app()
+|   |-- app.py             # FastAPI application factory
+|   |-- config.py          # Pydantic configuration models
+|   |-- security/          # Security utilities (JWT, CSRF, rate limiting, headers)
+|   |-- mail/              # Email provider implementations
+|   |-- navigation/        # Navigation type renderers
+|   |-- sections/          # Section type renderers
+|   |-- templates/         # Jinja2 templates
+|   |-- routers/           # FastAPI routers
+|   |-- utils/             # Utilities (markdown, yaml)
+|-- docs/                  # Engine documentation
+|-- pyproject.toml         # Package definition
+|-- LICENSE
+|-- README.md
 ```
 
 ## Development Setup
@@ -441,7 +441,7 @@ Use semantic versioning: `MAJOR.MINOR.PATCH`
 5. Check types: `mypy foundry_engine/`
 6. Commit changes
 7. Tag release: `git tag v0.2.0`
-8. Push: `git push origin main --tags`
+8. Push: `git push origin master --tags`
 
 ### Release Notes
 

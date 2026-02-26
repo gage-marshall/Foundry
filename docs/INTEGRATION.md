@@ -104,7 +104,7 @@ cd my-website
 
 # Initialize git
 git init
-git branch -M main
+git branch -M master
 ```
 
 ### Step 3: Create Site Structure
@@ -163,7 +163,7 @@ requires-python = ">=3.11"
 
 dependencies = [
     # SSH authentication (recommended for private repos)
-    "foundry-engine @ git+ssh://git@github.com/yourorg/foundry-engine.git@main",
+    "foundry-engine @ git+ssh://git@github.com/gage-marshall/Foundry.git@master",
 ]
 
 [build-system]
@@ -174,7 +174,7 @@ build-backend = "setuptools.build_meta"
 **Option B: requirements.txt**
 ```txt
 # Install engine from private GitHub repo
-git+ssh://git@github.com/yourorg/foundry-engine.git@main
+git+ssh://git@github.com/gage-marshall/Foundry.git@master
 ```
 
 ### Step 6: Create Site Configuration
@@ -327,7 +327,7 @@ Using Personal Access Token (PAT):
 # Select scopes: repo (all)
 
 # Install with token in URL (not recommended - use SSH instead)
-pip install git+https://<USERNAME>:<TOKEN>@github.com/yourorg/foundry-engine.git@main
+pip install git+https://<USERNAME>:<TOKEN>@github.com/gage-marshall/Foundry.git@master
 ```
 
 ---
@@ -411,11 +411,11 @@ gunicorn main:app -w 4 -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000
 
 ## Updating the Engine
 
-### Update to Latest Main Branch
+### Update to Latest Master Branch
 
 ```bash
 # Local development
-pip install --upgrade --force-reinstall git+ssh://git@github.com/yourorg/foundry-engine.git@main
+pip install --upgrade --force-reinstall git+ssh://git@github.com/gage-marshall/Foundry.git@master
 
 # Or if using pyproject.toml
 pip install --upgrade --force-reinstall -e .
@@ -427,32 +427,32 @@ pip install --upgrade --force-reinstall -e .
 
 ```toml
 # Pin to version tag
-"foundry-engine @ git+ssh://git@github.com/yourorg/foundry-engine.git@v0.1.0"
+"foundry-engine @ git+ssh://git@github.com/gage-marshall/Foundry.git@v0.1.0"
 
 # Pin to specific commit (maximum stability)
-"foundry-engine @ git+ssh://git@github.com/yourorg/foundry-engine.git@abc123def456"
+"foundry-engine @ git+ssh://git@github.com/gage-marshall/Foundry.git@abc123def456"
 ```
 
 Then reinstall:
 ```bash
-pip install --upgrade --force-reinstall git+ssh://git@github.com/yourorg/foundry-engine.git@v0.1.0
+pip install --upgrade --force-reinstall git+ssh://git@github.com/gage-marshall/Foundry.git@v0.1.0
 ```
 
 ### Version Pinning Strategy
 
-**Development**: Track `main` branch
+**Development**: Track `master` branch
 ```toml
-git+ssh://git@github.com/yourorg/foundry-engine.git@main
+git+ssh://git@github.com/gage-marshall/Foundry.git@master
 ```
 
 **Staging**: Use version tags
 ```toml
-git+ssh://git@github.com/yourorg/foundry-engine.git@v0.2.0
+git+ssh://git@github.com/gage-marshall/Foundry.git@v0.2.0
 ```
 
 **Production**: Pin to specific commit
 ```toml
-git+ssh://git@github.com/yourorg/foundry-engine.git@abc123def456789
+git+ssh://git@github.com/gage-marshall/Foundry.git@abc123def456789
 ```
 
 ### Testing Engine Updates
@@ -470,8 +470,8 @@ pip install --upgrade --force-reinstall -e .
 # Test thoroughly
 python main.py
 
-# If good, merge to main
-git checkout main
+# If good, merge to master
+git checkout master
 git merge test-engine-v0.2.0
 ```
 
@@ -588,7 +588,7 @@ AttributeError: 'FoundryEngine' has no attribute 'new_feature'
 
 2. Force reinstall specific version:
    ```bash
-   pip install --force-reinstall git+ssh://git@github.com/yourorg/foundry-engine.git@v0.2.0
+   pip install --force-reinstall git+ssh://git@github.com/gage-marshall/Foundry.git@v0.2.0
    ```
 
 3. Clear pip cache:
@@ -627,13 +627,13 @@ If managing multiple sites:
 
 ```bash
 # Site 1 - Production (stable)
-git+ssh://git@github.com/yourorg/foundry-engine.git@v1.0.0
+git+ssh://git@github.com/gage-marshall/Foundry.git@v1.0.0
 
 # Site 2 - Staging (latest features)
-git+ssh://git@github.com/yourorg/foundry-engine.git@main
+git+ssh://git@github.com/gage-marshall/Foundry.git@master
 
 # Site 3 - Beta (testing new engine)
-git+ssh://git@github.com/yourorg/foundry-engine.git@v2.0.0-beta
+git+ssh://git@github.com/gage-marshall/Foundry.git@v2.0.0-beta
 ```
 
 ---

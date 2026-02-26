@@ -31,10 +31,10 @@ Foundry Engine is designed to be installed as a **Python package** in your site 
 
 ```bash
 # SSH (recommended for private repos)
-pip install git+ssh://git@github.com/yourorg/foundry-engine.git@main
+pip install git+ssh://git@github.com/gage-marshall/Foundry.git@master
 
 # HTTPS
-pip install git+https://github.com/yourorg/foundry-engine.git@main
+pip install git+https://github.com/gage-marshall/Foundry.git@master
 ```
 
 ### Or via pyproject.toml
@@ -42,7 +42,7 @@ pip install git+https://github.com/yourorg/foundry-engine.git@main
 ```toml
 [project]
 dependencies = [
-    "foundry-engine @ git+ssh://git@github.com/yourorg/foundry-engine.git@main",
+    "foundry-engine @ git+ssh://git@github.com/gage-marshall/Foundry.git@master",
 ]
 ```
 
@@ -150,33 +150,33 @@ Visit `http://localhost:8000`
 ### Your Site Repository
 
 ```
-my-website/                 ← Your site repository
-├── main.py                 (Imports foundry-engine)
-├── pyproject.toml          (Defines engine dependency)
-├── .env                    (Environment variables)
-├── config.yaml             (Site configuration)
-├── content/
-│   ├── pages/             (Page definitions - YAML)
-│   └── sections/          (Section content - Markdown)
-├── theme/
-│   └── custom.css         (Site-specific styles)
-└── assets/
-    └── images/            (Images, fonts, etc.)
+my-website/                 # Your site repository
+|-- main.py                 (Imports foundry-engine)
+|-- pyproject.toml          (Defines engine dependency)
+|-- .env                    (Environment variables)
+|-- config.yaml             (Site configuration)
+|-- content/
+|   |-- pages/             (Page definitions - YAML)
+|   |-- sections/          (Section content - Markdown)
+|-- theme/
+|   |-- custom.css         (Site-specific styles)
+|-- assets/
+|   |-- images/            (Images, fonts, etc.)
 ```
 
 ### Engine Package (Imported)
 
 ```
-foundry-engine/            ← Installed as dependency
-└── foundry_engine/
-    ├── app.py            (FastAPI application factory)
-    ├── config.py         (Configuration models)
-    ├── security/         (Security modules)
-    ├── mail/             (Email providers)
-    ├── navigation/       (Navigation types)
-    ├── sections/         (Section types)
-    ├── templates/        (Jinja2 templates)
-    └── routers/          (API routes)
+foundry-engine/            # Installed as dependency
+|-- foundry_engine/
+|   |-- app.py            (FastAPI application factory)
+|   |-- config.py         (Configuration models)
+|   |-- security/         (Security modules)
+|   |-- mail/             (Email providers)
+|   |-- navigation/       (Navigation types)
+|   |-- sections/         (Section types)
+|   |-- templates/        (Jinja2 templates)
+|   |-- routers/          (API routes)
 ```
 
 ## Built-in Section Types
@@ -299,13 +299,13 @@ pytest
 
 ### Format Code
 ```bash
-black foundry_engine/
-ruff check foundry_engine/
+black Foundry/
+ruff Foundry/
 ```
 
 ### Type Checking
 ```bash
-mypy foundry_engine/
+mypy Foundry/
 ```
 
 ## Documentation
@@ -321,29 +321,29 @@ mypy foundry_engine/
 ### Update to Latest
 
 ```bash
-pip install --upgrade --force-reinstall git+ssh://git@github.com/yourorg/foundry-engine.git@main
+pip install --upgrade --force-reinstall git+ssh://git@github.com/gage-marshall/Foundry.git@master
 ```
 
 ### Pin to Specific Version
 
 ```toml
 # Pin to version tag
-"foundry-engine @ git+ssh://git@github.com/yourorg/foundry-engine.git@v0.1.0"
+"foundry-engine @ git+ssh://git@github.com/gage-marshall/Foundry.git@v0.1.0"
 
 # Pin to commit hash (maximum stability)
-"foundry-engine @ git+ssh://git@github.com/yourorg/foundry-engine.git@abc123def"
+"foundry-engine @ git+ssh://git@github.com/gage-marshall/Foundry.git@abc123def"
 ```
 
 ## Version Pinning Strategy
 
-- **Development**: Track `main` branch for latest features
+- **Development**: Track `master` branch for latest features
 - **Staging**: Use version tags (e.g., `v0.2.0`)
 - **Production**: Pin to specific commit hashes for stability
 
 ## License
 
-Proprietary source-available - see LICENSE file for details
+MIT License - see LICENSE file for details
 
 ---
 
-Built with ❤️ using FastAPI, Jinja2, and modern Python
+Built with care using FastAPI, Jinja2, and modern Python

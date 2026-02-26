@@ -2,10 +2,10 @@
 name = "foundry-engine"
 version = "0.1.0"
 description = "A modular FastAPI-based static site engine package optimized for security, reliability, and speed. Install as a dependency in your site repositories."
-authors = [{name = "Foundry Technologies"}]
+authors = [{name = "Gage Marshall"}]
 readme = "README.md"
 requires-python = ">=3.11"
-license = {text = "Proprietary"}
+license = {text = "MIT"}
 keywords = ["fastapi", "static-site", "web-framework", "cms", "package"]
 classifiers = [
     "Development Status :: 4 - Beta",
