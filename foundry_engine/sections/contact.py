@@ -1,4 +1,4 @@
-"""Contact form section for Foundry Engine."""
+"""Contact form section for Foundry Engine"""
 
 from typing import Any
 
