@@ -34,7 +34,7 @@ version = "0.1.0"
 requires-python = ">=3.11"
 
 dependencies = [
-    "foundry-engine @ git+ssh://git@github.com/gage-marshall/Foundry.git@master",
+    "foundry-engine @ git+https://github.com/gage-marshall/Foundry.git@master",
 ]
 
 [build-system]
@@ -54,7 +54,7 @@ pip install -e .
 ```bash
 python -m venv .venv
 source .venv/bin/activate
-pip install git+ssh://git@github.com/gage-marshall/Foundry.git@master
+pip install git+https://github.com/gage-marshall/Foundry.git@master
 ```
 
 ## Step 3: Create Entry Point
@@ -263,7 +263,7 @@ See [Deployment Guide](DEPLOYMENT.md) for production deployment options.
 source .venv/bin/activate
 
 # Reinstall engine
-pip install --force-reinstall git+ssh://git@github.com/gage-marshall/Foundry.git@master
+pip install --force-reinstall git+https://github.com/gage-marshall/Foundry.git@master
 ```
 
 ### Config Not Found

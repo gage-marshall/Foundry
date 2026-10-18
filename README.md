@@ -1,6 +1,6 @@
 # Foundry Engine
 
-A modern, secure, and blazingly fast static site engine built with FastAPI. Designed as a **Python package** for rapid deployment of 1-5 page sites with a focus on security, reliability, and speed.
+A small FastAPI site engine for 1–5 page content sites: YAML for structure, Markdown for content, Jinja2 templates, with contact forms and security hardening built in. Designed as a **Python package** you install into each site's repository.
 
 ## Features
 
@@ -30,10 +30,6 @@ Foundry Engine is designed to be installed as a **Python package** in your site 
 ### Install from GitHub
 
 ```bash
-# SSH (recommended for private repos)
-pip install git+ssh://git@github.com/gage-marshall/Foundry.git@master
-
-# HTTPS
 pip install git+https://github.com/gage-marshall/Foundry.git@master
 ```
 
@@ -42,7 +38,7 @@ pip install git+https://github.com/gage-marshall/Foundry.git@master
 ```toml
 [project]
 dependencies = [
-    "foundry-engine @ git+ssh://git@github.com/gage-marshall/Foundry.git@master",
+    "foundry-engine @ git+https://github.com/gage-marshall/Foundry.git@master",
 ]
 ```
 
@@ -285,27 +281,22 @@ security:
 ### Clone Engine Repository
 
 ```bash
-git clone <engine-repo-url>
-cd foundry-engine
+git clone https://github.com/gage-marshall/Foundry.git
+cd Foundry
 python -m venv .venv
 source .venv/bin/activate
 pip install -e ".[dev]"
 ```
 
-### Run Tests
-```bash
-pytest
-```
-
 ### Format Code
 ```bash
-black Foundry/
-ruff Foundry/
+black foundry_engine/
+ruff check foundry_engine/
 ```
 
 ### Type Checking
 ```bash
-mypy Foundry/
+mypy foundry_engine/
 ```
 
 ## Documentation
@@ -321,17 +312,17 @@ mypy Foundry/
 ### Update to Latest
 
 ```bash
-pip install --upgrade --force-reinstall git+ssh://git@github.com/gage-marshall/Foundry.git@master
+pip install --upgrade --force-reinstall git+https://github.com/gage-marshall/Foundry.git@master
 ```
 
 ### Pin to Specific Version
 
 ```toml
 # Pin to version tag
-"foundry-engine @ git+ssh://git@github.com/gage-marshall/Foundry.git@v0.1.0"
+"foundry-engine @ git+https://github.com/gage-marshall/Foundry.git@v0.1.0"
 
 # Pin to commit hash (maximum stability)
-"foundry-engine @ git+ssh://git@github.com/gage-marshall/Foundry.git@abc123def"
+"foundry-engine @ git+https://github.com/gage-marshall/Foundry.git@abc123def"
 ```
 
 ## Version Pinning Strategy
