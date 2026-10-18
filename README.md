@@ -2,6 +2,8 @@
 
 A small FastAPI site engine for 1–5 page content sites: YAML for structure, Markdown for content, Jinja2 templates, with contact forms and security hardening built in. Designed as a **Python package** you install into each site's repository.
 
+![The hero section of a Foundry site, defined in YAML and Markdown](docs/screenshot.jpg)
+
 ## Features
 
 ### Security First
